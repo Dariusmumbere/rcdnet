@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management | RCDNET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            transition: margin-left var(--transition-speed);
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .logo h1 {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background-color: var(--dark-color);
+            color: white;
+            transition: width var(--transition-speed);
+            overflow: hidden;
+            z-index: 99;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu li {
+            position: relative;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--light-color);
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--primary-color);
+        }
+
+        .sidebar-menu li a i {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-menu li a span {
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .sidebar-menu li a span {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-menu li a {
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        .sidebar.collapsed .sidebar-menu li a i {
+            margin-right: 0;
+        }
+
+        .submenu {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .submenu.show {
+            max-height: 500px;
+        }
+
+        .submenu li a {
+            padding-left: 50px !important;
+            font-size: 0.9rem;
+        }
+
+        .sidebar.collapsed .submenu li a {
+            padding-left: 0 !important;
+            justify-content: center;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            transition: margin-left var(--transition-speed);
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Project Management Styles */
+        .project-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .project-header h2 {
+            color: var(--dark-color);
+            font-size: 1.5rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: var(--dark-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .project-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Project Cards */
+        .program-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .program-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #eee;
+        }
+
+        .program-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .program-header {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #eee;
+        }
+
+        .program-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(52, 152, 219, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .program-title {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .program-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .program-body {
+            padding: 20px;
+        }
+
+        .program-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            font-size: 0.9rem;
+        }
+
+        .stat-label {
+            display: block;
+            color: #777;
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .program-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Project Table */
+        .project-table-container {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table-title {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 8px 15px 8px 35px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            width: 200px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .project-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .project-table th {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+        }
+
+        .project-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .project-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .project-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        .status-badge.active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .status-badge.planned {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.2);
+        }
+
+        .status-badge.completed {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #7f8c8d;
+            border: 1px solid rgba(149, 165, 166, 0.2);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            margin: 0 2px;
+            color: #95a5a6;
+            transition: all 0.2s;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--primary-color);
+        }
+
+        .action-btn.delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--dark-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--dark-color);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .project-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .form-actions {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .project-container {
+                padding: 20px;
+            }
+            
+            .project-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+            
+            .project-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="logo.jpg" alt="RWENZORI COMMUNITY DEVELOPMENT NETWORK Logo">
+            <h1>RWENZORI COMMUNITY DEVELOPMENT NETWORK(RCDNET)</h1>
+        </div>
+        <div class="user-profile">
+            <div class="user-info">
+                <span class="user-name">Ndyakurungi Mugisha</span>
+                <span class="user-role">Chief Executive Director</span>
+            </div>
+            <img src="mugisha.png" alt="User Profile">
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Notice Board</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="fundraising.html">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Fundraising Documents</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="donations.html">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Collect Donations</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="projects.html" class="active">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Plan and Manage</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-users"></i>
+                        <span>Beneficiaries</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content" id="mainContent">
+            <div class="project-container">
+                <div class="project-header">
+                    <h2><i class="fas fa-project-diagram"></i> Project Management</h2>
+                    <button class="btn btn-primary" id="newProjectBtn">
+                        <i class="fas fa-plus"></i> New Project
+                    </button>
+                </div>
+
+                <!-- Program Area Selection -->
+                <div class="program-selection">
+                    <h3>Select Program Area</h3>
+                    <p>Choose a program area to view or create related projects</p>
+                    
+                    <div class="program-cards">
+                        <div class="program-card" onclick="selectProgram('women_empowerment')">
+                            <div class="program-header">
+                                <div class="program-icon">
+                                    <i class="fas fa-fist-raised"></i>
+                                </div>
+                                <h3 class="program-title">Women Empowerment</h3>
+                                <p class="program-description">Support women's rights, leadership, and economic opportunities in the Rwenzori region.</p>
+                            </div>
+                            <div class="program-body">
+                                <div class="program-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Active Projects</span>
+                                        <span class="stat-value">3</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Budget</span>
+                                        <span class="stat-value">UGX 15M</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="program-footer">
+                                <span class="status-badge active">Active</span>
+                                <button class="btn btn-secondary btn-sm">View Projects</button>
+                            </div>
+                        </div>
+                        
+                        <div class="program-card" onclick="selectProgram('vocational_education')">
+                            <div class="program-header">
+                                <div class="program-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <h3 class="program-title">Vocational Education</h3>
+                                <p class="program-description">Provide skill-based training and employment opportunities for youth and adults.</p>
+                            </div>
+                            <div class="program-body">
+                                <div class="program-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Active Projects</span>
+                                        <span class="stat-value">2</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Budget</span>
+                                        <span class="stat-value">UGX 10M</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="program-footer">
+                                <span class="status-badge active">Active</span>
+                                <button class="btn btn-secondary btn-sm">View Projects</button>
+                            </div>
+                        </div>
+                        
+                        <div class="program-card" onclick="selectProgram('climate_mitigation')">
+                            <div class="program-header">
+                                <div class="program-icon">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <h3 class="program-title">Climate Change Mitigation</h3>
+                                <p class="program-description">Promote sustainable practices and environmental awareness in local communities.</p>
+                            </div>
+                            <div class="program-body">
+                                <div class="program-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Active Projects</span>
+                                        <span class="stat-value">1</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Budget</span>
+                                        <span class="stat-value">UGX 5M</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="program-footer">
+                                <span class="status-badge planned">Planned</span>
+                                <button class="btn btn-secondary btn-sm">View Projects</button>
+                            </div>
+                        </div>
+                        
+                        <div class="program-card" onclick="selectProgram('reproductive_health')">
+                            <div class="program-header">
+                                <div class="program-icon">
+                                    <i class="fas fa-heartbeat"></i>
+                                </div>
+                                <h3 class="program-title">Reproductive Health</h3>
+                                <p class="program-description">Ensure access to quality reproductive health services and education.</p>
+                            </div>
+                            <div class="program-body">
+                                <div class="program-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Active Projects</span>
+                                        <span class="stat-value">2</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Budget</span>
+                                        <span class="stat-value">UGX 8M</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="program-footer">
+                                <span class="status-badge active">Active</span>
+                                <button class="btn btn-secondary btn-sm">View Projects</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Table -->
+                <div class="project-table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Current Projects</h3>
+                        <div class="table-actions">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Search projects..." id="projectSearch">
+                            </div>
+                            <div>
+                                <select id="projectFilter" class="btn btn-secondary">
+                                    <option value="all">All Projects</option>
+                                    <option value="active">Active</option>
+                                    <option value="planned">Planned</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="project-table">
+                            <thead>
+                                <tr>
+                                    <th>Project Name</th>
+                                    <th>Program Area</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Budget (UGX)</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Women Entrepreneurship Training</td>
+                                    <td>Women Empowerment</td>
+                                    <td>2023-06-01</td>
+                                    <td>2023-12-31</td>
+                                    <td>5,000,000</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>
+                                        <button class="action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Vocational Skills Development</td>
+                                    <td>Vocational Education</td>
+                                    <td>2023-07-15</td>
+                                    <td>2024-01-15</td>
+                                    <td>7,500,000</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>
+                                        <button class="action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Tree Planting Initiative</td>
+                                    <td>Climate Change Mitigation</td>
+                                    <td>2023-09-01</td>
+                                    <td>2024-03-01</td>
+                                    <td>3,000,000</td>
+                                    <td><span class="status-badge planned">Planned</span></td>
+                                    <td>
+                                        <button class="action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Youth Reproductive Health Education</td>
+                                    <td>Reproductive Health</td>
+                                    <td>2023-05-10</td>
+                                    <td>2023-11-10</td>
+                                    <td>4,200,000</td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td>
+                                        <button class="action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Women's Savings Groups</td>
+                                    <td>Women Empowerment</td>
+                                    <td>2023-04-01</td>
+                                    <td>2023-10-31</td>
+                                    <td>2,800,000</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                    <td>
+                                        <button class="action-btn" title="View"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-project-diagram"></i> Create New Project</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm" class="project-form">
+                    <div class="form-group">
+                        <label for="programArea">Program Area*</label>
+                        <select id="programArea" required>
+                            <option value="">Select program area</option>
+                            <option value="women_empowerment">Women Empowerment</option>
+                            <option value="vocational_education">Vocational Education</option>
+                            <option value="climate_mitigation">Climate Change Mitigation</option>
+                            <option value="reproductive_health">Reproductive Health</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectName">Project Name*</label>
+                        <input type="text" id="projectName" placeholder="Enter project name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="startDate">Start Date*</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="endDate">End Date*</label>
+                        <input type="date" id="endDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectBudget">Budget (UGX)*</label>
+                        <input type="number" id="projectBudget" placeholder="Enter project budget" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectStatus">Status*</label>
+                        <select id="projectStatus" required>
+                            <option value="planned">Planned</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="scopeStatement">Scope Statement*</label>
+                        <textarea id="scopeStatement" placeholder="Describe the project scope, objectives, and deliverables" required></textarea>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="projectDescription">Project Description</label>
+                        <textarea id="projectDescription" placeholder="Provide detailed description of the project"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Project</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                
+                const icon = this.querySelector('i');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-indent');
+                } else {
+                    icon.classList.remove('fa-indent');
+                    icon.classList.add('fa-bars');
+                }
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('show') && 
+                    !e.target.closest('.sidebar') && 
+                    !e.target.closest('.menu-toggle')) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+
+        // Project modal functionality
+        document.getElementById('newProjectBtn').addEventListener('click', function() {
+            document.getElementById('projectModal').classList.add('show');
+        });
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('projectModal')) {
+                closeModal();
+            }
+        });
+
+        // Form submission
+        document.getElementById('projectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!validateProjectForm()) {
+                return;
+            }
+            
+            // Create project object
+            const project = {
+                programArea: document.getElementById('programArea').value,
+                name: document.getElementById('projectName').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                budget: document.getElementById('projectBudget').value,
+                status: document.getElementById('projectStatus').value,
+                scope: document.getElementById('scopeStatement').value,
+                description: document.getElementById('projectDescription').value
+            };
+            
+            // Here you would typically send the data to your backend
+            console.log('Project data:', project);
+            
+            // Show success message
+            alert('Project created successfully!');
+            
+            // Close modal and reset form
+            closeModal();
+            this.reset();
+            
+            // In a real app, you would refresh the projects table here
+        });
+
+        function validateProjectForm() {
+            let isValid = true;
+            const requiredFields = [
+                'programArea', 'projectName', 'startDate', 
+                'endDate', 'projectBudget', 'scopeStatement'
+            ];
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'var(--accent-color)';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            // Validate date range
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            
+            if (startDate >= endDate) {
+                alert('End date must be after start date');
+                document.getElementById('endDate').style.borderColor = 'var
+                        </script>
+</body>
+</html>

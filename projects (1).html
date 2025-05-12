@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management | RCDNET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            margin-top: var(--header-height);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Projects Section Styles */
+        .projects-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: var(--dark-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        /* Projects Table Styles */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .projects-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .projects-table th, 
+        .projects-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .projects-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+        }
+
+        .projects-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .projects-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .projects-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        .status-badge.active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .status-badge.planned {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.2);
+        }
+
+        .status-badge.completed {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #7f8c8d;
+            border: 1px solid rgba(149, 165, 166, 0.2);
+        }
+
+        .status-badge.in_progress {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        /* Action buttons */
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            margin: 0 2px;
+            color: #95a5a6;
+            transition: all 0.2s;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--primary-color);
+        }
+
+        .action-btn.delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+        }
+
+        /* Project Modal Styles */
+        .project-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .project-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .validation-error {
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Budget Table Styles */
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .budget-table th, 
+        .budget-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .budget-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .budget-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .budget-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .budget-total {
+            font-weight: bold;
+            text-align: right;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 2px solid #ddd;
+        }
+
+        /* Budget Form Styles */
+        .budget-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .budget-form .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .budget-form .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .budget-form .form-group input,
+        .budget-form .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .budget-form .form-actions {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        /* Budget Section */
+        .budget-section {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .budget-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* Loading state */
+        .loading {
+            padding: 20px;
+            text-align: center;
+            color: #777;
+        }
+
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .section-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .projects-table th, 
+            .projects-table td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .budget-form .form-group {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main class="main-content">
+            <h1 class="page-title">
+                <i class="fas fa-project-diagram"></i>
+                Project Management
+            </h1>
+
+            <div class="projects-container">
+                <div class="section-header">
+                    <h2 class="section-title">Current Projects</h2>
+                    <div class="section-actions">
+                        <button class="btn" id="createProjectBtn">
+                            <i class="fas fa-plus"></i> New Project
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="projects-table" id="projectsTable">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Program Area</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Budget (UGX)</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody">
+                            <!-- Projects will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Budget Section (visible when viewing a project) -->
+            <div class="budget-section" id="budgetSection" style="display: none;">
+                <div class="budget-section-header">
+                    <h2 class="section-title">Project Budget</h2>
+                    <button class="btn" id="addBudgetItemBtn">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </div>
+
+                <!-- Budget Item Form (hidden by default) -->
+                <form id="budgetItemForm" class="budget-form" style="display: none;">
+                    <input type="hidden" id="budgetItemId">
+                    <input type="hidden" id="budgetProjectId">
+                    
+                    <div class="form-group">
+                        <label for="itemName">Item Name*</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemCategory">Category*</label>
+                        <select id="itemCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Personnel">Personnel</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Materials">Materials</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemQuantity">Quantity*</label>
+                        <input type="number" id="itemQuantity" min="0" step="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemUnitPrice">Unit Price (UGX)*</label>
+                        <input type="number" id="itemUnitPrice" min="0" step="1000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemDescription">Description</label>
+                        <input type="text" id="itemDescription">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelBudgetItemBtn">Cancel</button>
+                        <button type="button" class="btn" id="saveBudgetItemBtn">Save Item</button>
+                    </div>
+                </form>
+
+                <!-- Budget Items Table -->
+                <div class="table-responsive">
+                    <table class="budget-table" id="budgetTable">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Unit Price (UGX)</th>
+                                <th>Total (UGX)</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budgetTableBody">
+                            <!-- Budget items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="budget-total" id="budgetTotal">
+                    Total Budget: UGX 0
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create/Edit Project Modal -->
+    <div class="project-modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Create New Project</h3>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <input type="hidden" id="projectId">
+                    
+                    <div class="form-group">
+                        <label for="programArea">Program Area*</label>
+                        <select id="programArea" required>
+                            <option value="">Select Program Area</option>
+                            <option value="Women Empowerment">Women Empowerment</option>
+                            <option value="Vocational Education">Vocational Education</option>
+                            <option value="Climate Change Mitigation">Climate Change Mitigation</option>
+                            <option value="Reproductive Health">Reproductive Health</option>
+                        </select>
+                        <div class="validation-error" id="programAreaError">Please select a program area</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectName">Project Name*</label>
+                        <input type="text" id="projectName" required>
+                        <div class="validation-error" id="projectNameError">Please enter a project name</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">Start Date*</label>
+                            <input type="date" id="startDate" required>
+                            <div class="validation-error" id="startDateError">Please select a start date</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">End Date*</label>
+                            <input type="date" id="endDate" required>
+                            <div class="validation-error" id="endDateError">Please select an end date</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="scopeStatement">Scope Statement*</label>
+                        <textarea id="scopeStatement" required></textarea>
+                        <div class="validation-error" id="scopeStatementError">Please provide a scope statement</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="budget">Budget (UGX)*</label>
+                            <input type="number" id="budget" min="0" step="1000" required>
+                            <div class="validation-error" id="budgetError">Please enter a valid budget</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fundingSource">Funding Source</label>
+                            <select id="fundingSource">
+                                <option value="General Funds">General Funds</option>
+                                <option value="Donation">Donation</option>
+                                <option value="Grant">Grant</option>
+                                <option value="Government">Government</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectStatus">Status</label>
+                        <select id="projectStatus">
+                            <option value="planned">Planned</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn" id="saveProjectBtn">Save Project</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const createProjectBtn = document.getElementById('createProjectBtn');
+            const projectModal = document.getElementById('projectModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const saveProjectBtn = document.getElementById('saveProjectBtn');
+            const projectForm = document.getElementById('projectForm');
+            const projectsTableBody = document.getElementById('projectsTableBody');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            // Budget Elements
+            const budgetSection = document.getElementById('budgetSection');
+            const addBudgetItemBtn = document.getElementById('addBudgetItemBtn');
+            const budgetItemForm = document.getElementById('budgetItemForm');
+            const budgetTableBody = document.getElementById('budgetTableBody');
+            const saveBudgetItemBtn = document.getElementById('saveBudgetItemBtn');
+            const cancelBudgetItemBtn = document.getElementById('cancelBudgetItemBtn');
+            const budgetTotal = document.getElementById('budgetTotal');
+            
+            // Variables
+            let currentProjectId = null;
+            let isEditMode = false;
+            let currentBudgetProjectId = null;
+            let isEditBudgetMode = false;
+
+            // Event Listeners
+            createProjectBtn.addEventListener('click', openCreateProjectModal);
+            closeModalBtn.addEventListener('click', closeProjectModal);
+            cancelBtn.addEventListener('click', closeProjectModal);
+            saveProjectBtn.addEventListener('click', saveProject);
+            
+            // Budget Event Listeners
+            addBudgetItemBtn.addEventListener('click', showBudgetItemForm);
+            cancelBudgetItemBtn.addEventListener('click', hideBudgetItemForm);
+            saveBudgetItemBtn.addEventListener('click', saveBudgetItem);
+            
+            // Form validation
+            projectForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProject();
+            });
+
+            // Initialize the page
+            loadProjects();
+
+            // Functions
+            function openCreateProjectModal() {
+                currentProjectId = null;
+                isEditMode = false;
+                modalTitle.textContent = 'Create New Project';
+                projectForm.reset();
+                document.getElementById('projectStatus').value = 'planned';
+                openProjectModal();
+            }
+
+            function openEditProjectModal(projectId) {
+                currentProjectId = projectId;
+                isEditMode = true;
+                modalTitle.textContent = 'Edit Project';
+                
+                // Fetch project data and populate form
+                fetch(`https://man-m681.onrender.com/projects/${projectId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch project');
+                        return response.json();
+                    })
+                    .then(project => {
+                        document.getElementById('programArea').value = project.name.includes('Women') ? 'Women Empowerment' : 
+                                                                     project.name.includes('Vocational') ? 'Vocational Education' :
+                                                                     project.name.includes('Climate') ? 'Climate Change Mitigation' :
+                                                                     project.name.includes('Reproductive') ? 'Reproductive Health' :
+                                                                     project.name.includes('Agriculture') ? 'Agriculture Extension' :
+                                                                     project.name.includes('Economic') ? 'Economic Empowerment' : '';
+                        document.getElementById('projectName').value = project.name.split(' - ')[1] || project.name;
+                        document.getElementById('startDate').value = project.start_date;
+                        document.getElementById('endDate').value = project.end_date;
+                        document.getElementById('scopeStatement').value = project.description || '';
+                        document.getElementById('budget').value = project.budget;
+                        document.getElementById('fundingSource').value = project.funding_source;
+                        document.getElementById('projectStatus').value = project.status;
+                    })
+                    .catch(error => {
+                        console.error('Error loading project:', error);
+                        alert('Failed to load project data');
+                    });
+                
+                openProjectModal();
+            }
+
+            function openProjectModal() {
+                projectModal.classList.add('show');
+            }
+
+            function closeProjectModal() {
+                projectModal.classList.remove('show');
+                resetValidationErrors();
+            }
+
+            function resetValidationErrors() {
+                document.querySelectorAll('.validation-error').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+
+            function validateForm() {
+                let isValid = true;
+                resetValidationErrors();
+
+                const requiredFields = [
+                    { id: 'programArea', errorId: 'programAreaError' },
+                    { id: 'projectName', errorId: 'projectNameError' },
+                    { id: 'startDate', errorId: 'startDateError' },
+                    { id: 'endDate', errorId: 'endDateError' },
+                    { id: 'scopeStatement', errorId: 'scopeStatementError' },
+                    { id: 'budget', errorId: 'budgetError' }
+                ];
+
+                requiredFields.forEach(field => {
+                    const element = document.getElementById(field.id);
+                    if (!element.value.trim()) {
+                        document.getElementById(field.errorId).style.display = 'block';
+                        element.style.borderColor = 'var(--accent-color)';
+                        isValid = false;
+                        
+                        // Focus on first invalid field
+                        if (isValid === false) {
+                            element.focus();
+                            isValid = null; // Prevent changing back to true
+                        }
+                    } else {
+                        element.style.borderColor = '';
+                    }
+                });
+
+                // Validate dates
+                const startDate = new Date(document.getElementById('startDate').value);
+                const endDate = new Date(document.getElementById('endDate').value);
+                
+                if (startDate && endDate && startDate > endDate) {
+                    document.getElementById('endDateError').textContent = 'End date must be after start date';
+                    document.getElementById('endDateError').style.display = 'block';
+                    document.getElementById('endDate').style.borderColor = 'var(--accent-color)';
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            function saveProject() {
+                if (validateForm() !== true) return;
+                
+                const projectData = {
+                    name: `${document.getElementById('projectName').value} - ${document.getElementById('programArea').value}`,
+                    description: document.getElementById('scopeStatement').value,
+                    start_date: document.getElementById('startDate').value,
+                    end_date: document.getElementById('endDate').value,
+                    budget: parseFloat(document.getElementById('budget').value),
+                    funding_source: document.getElementById('fundingSource').value,
+                    status: document.getElementById('projectStatus').value
+                };
+
+                const url = isEditMode 
+                    ? `https://man-m681.onrender.com/projects/${currentProjectId}`
+                    : 'https://man-m681.onrender.com/projects/';
+                
+                const method = isEditMode ? 'PUT' : 'POST';
+
+                // Show loading state
+                const originalText = saveProjectBtn.innerHTML;
+                saveProjectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveProjectBtn.disabled = true;
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(projectData)
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to save project');
+                    return response.json();
+                })
+                .then(() => {
+                    closeProjectModal();
+                    loadProjects();
+                })
+                .catch(error => {
+                    console.error('Error saving project:', error);
+                    alert('Failed to save project: ' + error.message);
+                })
+                .finally(() => {
+                    saveProjectBtn.innerHTML = originalText;
+                    saveProjectBtn.disabled = false;
+                });
+            }
+
+            function loadProjects() {
+    projectsTableBody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i> Loading projects...</td></tr>';
+    
+    fetch('https://man-m681.onrender.com/projects/')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch projects');
+            return response.json();
+        })
+        .then(data => {
+            projectsTableBody.innerHTML = '';
+            
+            if (data.projects && data.projects.length === 0) {
+                projectsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No projects found</td></tr>';
+                return;
+            }
+            
+            data.projects.forEach(project => {
+                // Extract program area from project name
+                const programArea = project.name.split(' - ')[0] || 'General';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${programArea}</td>
+                    <td>${project.name.split(' - ')[1] || project.name}</td>
+                    <td>${project.start_date}</td>
+                    <td>${project.end_date}</td>
+                    <td>${project.budget.toLocaleString()}</td>
+                    <td><span class="status-badge ${project.status}">${project.status.replace('_', ' ')}</span></td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewProject(${project.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" onclick="openEditProjectModal(${project.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteProject(${project.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                projectsTableBody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading projects:', error);
+            projectsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--accent-color);">Failed to load projects</td></tr>';
+        });
+}
+            function viewProject(projectId) {
+                showBudgetSection(projectId);
+                
+                // Scroll to budget section
+                budgetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function deleteProject(projectId) {
+                if (!confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+                    return;
+                }
+                
+                fetch(`https://man-m681.onrender.com/projects/${projectId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to delete project');
+                    return response.json();
+                })
+                .then(() => {
+                    loadProjects();
+                    if (currentBudgetProjectId === projectId) {
+                        hideBudgetSection();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting project:', error);
+                    alert('Failed to delete project');
+                });
+            }
+
+            // Budget Functions
+            function showBudgetSection(projectId) {
+                currentBudgetProjectId = projectId;
+                budgetSection.style.display = 'block';
+                document.getElementById('budgetProjectId').value = projectId;
+                loadBudgetItems(projectId);
+            }
+
+            function hideBudgetSection() {
+                budgetSection.style.display = 'none';
+                currentBudgetProjectId = null;
+                budgetTableBody.innerHTML = '';
+            }
+
+            function showBudgetItemForm() {
+                budgetItemForm.style.display = 'flex';
+                budgetItemForm.reset();
+                document.getElementById('budgetItemId').value = '';
+                isEditBudgetMode = false;
+            }
+
+            function hideBudgetItemForm() {
+                budgetItemForm.style.display = 'none';
+            }
+
+            function loadBudgetItems(projectId) {
+    budgetTableBody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i> Loading budget items...</td></tr>';
+    
+    fetch(`https://man-m681.onrender.com/budget-items/${projectId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch budget items');
+            return response.json();
+        })
+        .then(items => {
+            budgetTableBody.innerHTML = '';
+            
+            if (items.length === 0) {
+                budgetTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No budget items found</td></tr>';
+                budgetTotal.textContent = 'Total Budget: UGX 0';
+                return;
+            }
+            
+            let totalBudget = 0;
+            
+            items.forEach(item => {
+                totalBudget += item.total;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.item_name}</td>
+                    <td>${item.category}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.unit_price.toLocaleString()}</td>
+                    <td>${item.total.toLocaleString()}</td>
+                    <td>${item.description || '-'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editBudgetItem(${item.id}, '${item.item_name}', '${item.category}', ${item.quantity}, ${item.unit_price}, '${item.description || ''}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteBudgetItem(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                budgetTableBody.appendChild(row);
+            });
+            
+            budgetTotal.textContent = `Total Budget: UGX ${totalBudget.toLocaleString()}`;
+        })
+        .catch(error => {
+            console.error('Error loading budget items:', error);
+            budgetTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--accent-color);">Failed to load budget items</td></tr>';
+        });
+}
+            
+function updateProjectBudgetInTable(projectId, newBudget) {
+    const rows = document.querySelectorAll('#projectsTableBody tr');
+    rows.forEach(row => {
+        const rowProjectId = parseInt(row.querySelector('button.edit-btn').getAttribute('onclick').match(/\((\d+)/)[1]);
+        if (rowProjectId === projectId) {
+            const budgetCell = row.cells[4]; // Budget is the 5th column (0-based index 4)
+            budgetCell.textContent = newBudget.toLocaleString();
+        }
+    });
+}
+
+            function saveBudgetItem() {
+    const itemData = {
+        project_id: parseInt(document.getElementById('budgetProjectId').value),
+        item_name: document.getElementById('itemName').value,
+        category: document.getElementById('itemCategory').value,
+        quantity: parseFloat(document.getElementById('itemQuantity').value),
+        unit_price: parseFloat(document.getElementById('itemUnitPrice').value),
+        description: document.getElementById('itemDescription').value
+    };
+
+    // Simple validation
+    if (!itemData.item_name || !itemData.category || isNaN(itemData.quantity) || isNaN(itemData.unit_price)) {
+        alert('Please fill all required fields with valid values');
+        return;
+    }
+
+    const itemId = document.getElementById('budgetItemId').value;
+    const url = itemId 
+        ? `https://man-m681.onrender.com/budget-items/${itemId}`
+        : 'https://man-m681.onrender.com/budget-items/';
+    
+    const method = itemId ? 'PUT' : 'POST';
+
+    // Show loading state
+    const originalText = saveBudgetItemBtn.innerHTML;
+    saveBudgetItemBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    saveBudgetItemBtn.disabled = true;
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itemData)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to save budget item');
+        return response.json();
+    })
+    .then(() => {
+        // After saving the item, update the project's budget
+        return updateProjectBudget(currentBudgetProjectId);
+    })
+    .then(() => {
+        hideBudgetItemForm();
+        loadBudgetItems(currentBudgetProjectId);
+        loadProjects(); // Refresh the projects table to show updated budget
+    })
+    .catch(error => {
+        console.error('Error saving budget item:', error);
+        alert('Failed to save budget item: ' + error.message);
+    })
+    .finally(() => {
+        saveBudgetItemBtn.innerHTML = originalText;
+        saveBudgetItemBtn.disabled = false;
+    });
+}
+function updateProjectBudget(projectId) {
+    return fetch(`https://man-m681.onrender.com/budget-items/${projectId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch budget items');
+            return response.json();
+        })
+        .then(items => {
+            let totalBudget = 0;
+            items.forEach(item => {
+                totalBudget += item.total;
+            });
+
+            // Update the project's budget in the database
+            return fetch(`https://man-m681.onrender.com/projects/${projectId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    budget: totalBudget
+                    // Include other required fields if needed by your API
+                })
+            });
+        });
+}
+
+            function editBudgetItem(id, name, category, quantity, unitPrice, description) {
+                document.getElementById('budgetItemId').value = id;
+                document.getElementById('itemName').value = name;
+                document.getElementById('itemCategory').value = category;
+                document.getElementById('itemQuantity').value = quantity;
+                document.getElementById('itemUnitPrice').value = unitPrice;
+                document.getElementById('itemDescription').value = description;
+                
+                isEditBudgetMode = true;
+                budgetItemForm.style.display = 'flex';
+            }
+
+            function deleteBudgetItem(id) {
+    if (!confirm('Are you sure you want to delete this budget item?')) {
+        return;
+    }
+    
+    fetch(`https://man-m681.onrender.com/budget-items/${id}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to delete budget item');
+        return response.json();
+    })
+    .then(() => {
+        // After deleting the item, update the project's budget
+        return updateProjectBudget(currentBudgetProjectId);
+    })
+    .then(() => {
+        loadBudgetItems(currentBudgetProjectId);
+        loadProjects(); // Refresh the projects table to show updated budget
+    })
+    .catch(error => {
+        console.error('Error deleting budget item:', error);
+        alert('Failed to delete budget item');
+    });
+}
+            // Make functions available globally
+            window.editBudgetItem = editBudgetItem;
+            window.deleteBudgetItem = deleteBudgetItem;
+            window.viewProject = viewProject;
+            window.openEditProjectModal = openEditProjectModal;
+            window.deleteProject = deleteProject;
+        });
+    </script>
+</body>
+</html>

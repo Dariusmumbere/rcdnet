@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Management - RCDNET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="hrr.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .logo h1 {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            font-weight: 700;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            transition: margin-left var(--transition-speed);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* HR Dashboard Layout */
+        .hr-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        /* Employee Form Styles */
+        .employee-form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .section-title:hover {
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: var(--dark-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Employee Table Styles */
+        .employees-table-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 250px;
+        }
+
+        .search-box input {
+            padding-left: 35px;
+            width: 100%;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        /* Modern Table Styles */
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .modern-table thead th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #eee;
+            position: sticky;
+            top: 0;
+        }
+
+        .modern-table tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+
+        .modern-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .modern-table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        .status-badge.active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #7f8c8d;
+            border: 1px solid rgba(149, 165, 166, 0.2);
+        }
+
+        /* Action buttons */
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            margin: 0 2px;
+            color: #95a5a6;
+            transition: all 0.2s;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--primary-color);
+        }
+
+        .action-btn.delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+        }
+
+        /* Work Opportunities Section */
+        .work-opportunities {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .opportunity-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .opportunity-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .opportunity-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+
+        .opportunity-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .opportunity-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .opportunity-description {
+            margin-bottom: 15px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .opportunity-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .assigned-employees {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+        }
+
+        .employee-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--primary-color);
+        }
+
+        /* Activity Deployment Section */
+        .activity-deployment {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .deployment-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .deployment-form .form-group {
+            margin-bottom: 0;
+        }
+
+        .deployment-list {
+            margin-top: 30px;
+        }
+
+        .deployment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .deployment-info {
+            flex: 1;
+        }
+
+        .deployment-employee {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .deployment-activity {
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            gap: 10px;
+        }
+
+        .deployment-project {
+            font-size: 0.85rem;
+            color: #777;
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        /* Collapsible sections */
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .hr-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .employee-form-container {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .deployment-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        /* Loading state */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Validation styles */
+        .validation-error {
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group input:invalid, 
+        .form-group select:invalid, 
+        .form-group textarea:invalid {
+            border-color: var(--accent-color);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 50%;
+            max-width: 600px;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+        }
+        /* Payment Processing Styles */
+.payment-processing-section {
+    background-color: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-top: 30px;
+}
+
+.payment-tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.payment-tab-btn {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    color: #777;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+}
+
+.payment-tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.payment-tab-btn:hover:not(.active) {
+    color: var(--dark-color);
+}
+
+.payment-tab-content {
+    display: none;
+}
+
+.payment-tab-content.active {
+    display: block;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.payment-details {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 120px;
+}
+
+.detail-value {
+    flex: 1;
+}
+
+.table-filters {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Status badges for payments */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+.status-badge.pending {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+    border: 1px solid rgba(243, 156, 18, 0.2);
+}
+
+.status-badge.approved {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.status-badge.rejected {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.2);
+}
+ 
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo.jpg" alt="RCDNET Logo">
+            <h1>HR Management</h1>
+        </div>
+        <div class="user-profile">
+            <div class="user-info">
+                <span class="user-name">HR Manager</span>
+                <span class="user-role">Human Resources</span>
+            </div>
+            <img src="profile.jpg" alt="User Profile">
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-content">
+            <h1 class="page-title">
+                <i class="fas fa-users-cog"></i>
+                Human Resource Management
+            </h1>
+
+            <div class="hr-dashboard">
+                <!-- Employee Registration Form -->
+                <div class="employee-form-container">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-plus"></i>
+                        Register Employee
+                    </h2>
+                    
+                    <form id="employeeForm">
+                        <div class="form-group">
+                            <label for="employeeName">Full Name*</label>
+                            <input type="text" id="employeeName" required>
+                            <div class="validation-error" id="nameError">Please enter employee name</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeNIN">National ID (NIN)*</label>
+                            <input type="text" id="employeeNIN" required pattern="[A-Z0-9]{14}">
+                            <div class="validation-error" id="ninError">Please enter a valid NIN (14 alphanumeric characters)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeDOB">Date of Birth*</label>
+                            <input type="date" id="employeeDOB" required>
+                            <div class="validation-error" id="dobError">Please select date of birth</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeQualification">Highest Qualification*</label>
+                            <select id="employeeQualification" required>
+                                <option value="">Select qualification</option>
+                                <option value="primary">Primary Education</option>
+                                <option value="secondary">Secondary Education</option>
+                                <option value="diploma">Diploma</option>
+                                <option value="bachelors">Bachelor's Degree</option>
+                                <option value="masters">Master's Degree</option>
+                                <option value="phd">PhD</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="validation-error" id="qualificationError">Please select qualification</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeEmail">Email</label>
+                            <input type="email" id="employeeEmail">
+                            <div class="validation-error" id="emailError">Please enter a valid email</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeePhone">Phone Number</label>
+                            <input type="tel" id="employeePhone" pattern="[0-9]{10}">
+                            <div class="validation-error" id="phoneError">Please enter a valid phone number (10 digits)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeAddress">Profession</label>
+                            <textarea id="text" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="resetFormBtn">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Employee
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Employee Management Section -->
+                <div class="employees-table-container">
+                    <div class="table-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-users"></i>
+                            Employee Records
+                        </h2>
+                        
+                        <div class="table-actions">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="employeeSearch" placeholder="Search employees...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="modern-table" id="employeesTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>NIN</th>
+                                    <th>Qualification</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeesTableBody">
+                                <tr>
+                                    <td colspan="5" class="loading">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Work Opportunities Section -->
+                    <div class="work-opportunities">
+                        <h2 class="section-title" id="opportunitiesHeading">
+                            <i class="fas fa-briefcase"></i>
+                            Work Opportunities
+                        </h2>
+                        
+                        <div class="collapsible-content" id="opportunitiesContent">
+                            <div class="opportunity-form">
+                                <div class="form-group">
+                                    <label for="opportunityTitle">Title*</label>
+                                    <input type="text" id="opportunityTitle" required>
+                                    <div class="validation-error" id="opportunityTitleError">Please enter a title</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="opportunityDescription">Description*</label>
+                                    <textarea id="opportunityDescription" rows="4" required></textarea>
+                                    <div class="validation-error" id="opportunityDescError">Please enter a description</div>
+                                </div>
+                                
+                                <button class="btn btn-primary" id="createOpportunityBtn">
+                                    <i class="fas fa-plus"></i> Create Opportunity
+                                </button>
+                            </div>
+                            
+                            <div class="opportunity-list" id="opportunityList">
+                                <h3>Current Opportunities</h3>
+                                
+                                <div class="opportunity-card">
+                                    <div class="opportunity-header">
+                                        <h3 class="opportunity-title">Field Officer - Agriculture Project</h3>
+                                        <div class="opportunity-meta">
+                                            <span><i class="fas fa-calendar-alt"></i> 15 Oct - 15 Dec 2023</span>
+                                            <span><i class="fas fa-map-marker-alt"></i> Kasese District</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="opportunity-description">
+                                        Coordinate field activities for the agriculture extension project, train farmers, and monitor project implementation.
+                                    </div>
+                                    
+                                    <div class="opportunity-footer">
+                                        <div class="assigned-employees">
+                                            <span>Assigned:</span>
+                                            <div class="employee-avatar">JM</div>
+                                            <div class="employee-avatar">AM</div>
+                                            <div class="employee-avatar">+2</div>
+                                        </div>
+                                        
+                                        <button class="btn btn-primary btn-sm" onclick="openAssignEmployeeModal(1)">
+                                            <i class="fas fa-plus"></i> Assign Employee
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Deployment Section -->
+                    <div class="activity-deployment">
+                        <h2 class="section-title" id="deploymentsHeading">
+                            <i class="fas fa-tasks"></i>
+                            Staff Deployment
+                        </h2>
+                        
+                        <div class="collapsible-content" id="deploymentsContent">
+                            <div class="deployment-form">
+                                <div class="form-group">
+                                    <label for="deployEmployee">Employee</label>
+                                    <select id="deployEmployee">
+                                        <option value="">Select employee</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="deployActivity">Activity</label>
+                                    <select id="deployActivity">
+                                        <option value="">Select activity</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="deployRole">Role</label>
+                                    <select id="deployRole">
+                                        <option value="team_leader">Team Leader</option>
+                                        <option value="field_officer">Field Officer</option>
+                                        <option value="trainer">Trainer</option>
+                                        <option value="monitor">Monitor</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-primary" id="deployBtn">
+                                <i class="fas fa-user-check"></i> Deploy Employee
+                            </button>
+                            
+                            <div class="deployment-list" id="deploymentList">
+                                <h3>Current Deployments</h3>
+                                
+                                <div class="deployment-item">
+                                    <div class="deployment-info">
+                                        <div class="deployment-employee">John Mumbere</div>
+                                        <div class="deployment-activity">
+                                            <span><i class="fas fa-tasks"></i> Farmer Training Workshops</span>
+                                        </div>
+                                        <div class="deployment-project">
+                                            <span><i class="fas fa-project-diagram"></i> Agriculture Extension Project</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="deployment-actions">
+                                        <button class="action-btn edit-btn">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete-btn">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Add to your HR Management page -->
+<div class="payment-processing-section">
+    <div class="payment-tabs">
+        <button class="payment-tab-btn active" data-tab="request-payment">Request Payment</button>
+        <button class="payment-tab-btn" data-tab="pending-approvals">Pending Approvals</button>
+        <button class="payment-tab-btn" data-tab="payment-history">Payment History</button>
+    </div>
+
+    <div class="payment-tab-content active" id="request-payment">
+        <h3><i class="fas fa-money-bill-wave"></i> Request Staff Payment</h3>
+        <form id="paymentRequestForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="paymentEmployee">Employee*</label>
+                    <select id="paymentEmployee" required>
+                        <option value="">Select Employee</option>
+                        <!-- Will be populated by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="paymentPeriod">Payment Period*</label>
+                    <input type="month" id="paymentPeriod" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="paymentAmount">Amount (UGX)*</label>
+                    <input type="number" id="paymentAmount" min="0" step="1000" required>
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method*</label>
+                    <select id="paymentMethod" required>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="mobile_money">Mobile Money</option>
+                        <option value="cash">Cash</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="paymentDescription">Description</label>
+                <textarea id="paymentDescription" rows="3" placeholder="Salary for October, Bonus, etc."></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Submit Request
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="payment-tab-content" id="pending-approvals">
+        <div class="table-header">
+            <h3><i class="fas fa-clock"></i> Pending Approvals</h3>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="pendingSearch" placeholder="Search payments...">
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Amount</th>
+                        <th>Period</th>
+                        <th>Method</th>
+                        <th>Requested On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingPaymentsBody">
+                    <tr>
+                        <td colspan="6" class="loading">
+                            <div class="spinner"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="payment-tab-content" id="payment-history">
+        <div class="table-header">
+            <h3><i class="fas fa-history"></i> Payment History</h3>
+            <div class="table-filters">
+                <div class="form-group">
+                    <select id="historyStatusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="approved">Approved</option>
+                        <option value="pending">Pending</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="historySearch" placeholder="Search history...">
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Amount</th>
+                        <th>Period</th>
+                        <th>Status</th>
+                        <th>Requested On</th>
+                        <th>Approved/Rejected On</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentHistoryBody">
+                    <tr>
+                        <td colspan="6" class="loading">
+                            <div class="spinner"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal" id="approvalModal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h3><i class="fas fa-check-circle"></i> Process Payment Request</h3>
+        <form id="approvalForm">
+            <input type="hidden" id="approvalPaymentId">
+            
+            <div class="payment-details">
+                <div class="detail-row">
+                    <span class="detail-label">Employee:</span>
+                    <span class="detail-value" id="modalEmployee"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount:</span>
+                    <span class="detail-value" id="modalAmount"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Period:</span>
+                    <span class="detail-value" id="modalPeriod"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Requested On:</span>
+                    <span class="detail-value" id="modalRequestDate"></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="approvalRemarks">Remarks</label>
+                <textarea id="approvalRemarks" rows="3" placeholder="Optional comments..."></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-danger" id="rejectBtn">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+                <button type="button" class="btn btn-success" id="approveBtn">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+        </main>
+    </div>
+
+    <!-- Assign Employee Modal -->
+    <div class="modal" id="assignEmployeeModal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2><i class="fas fa-user-plus"></i> Assign Employee</h2>
+            <form id="assignEmployeeForm">
+                <input type="hidden" id="currentOpportunityId">
+                <div class="form-group">
+                    <label for="employeeToAssign">Employee*</label>
+                    <select id="employeeToAssign" required>
+                        <option value="">Select employee</option>
+                    </select>
+                    <div class="validation-error" id="assignEmployeeError">Please select an employee</div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAssignBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-check"></i> Assign
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            const employeeForm = document.getElementById('employeeForm');
+            const validationErrors = {
+                name: document.getElementById('nameError'),
+                nin: document.getElementById('ninError'),
+                dob: document.getElementById('dobError'),
+                qualification: document.getElementById('qualificationError'),
+                email: document.getElementById('emailError'),
+                phone: document.getElementById('phoneError')
+            };
+
+            // Show validation errors on form submit
+            employeeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset all error messages
+                Object.values(validationErrors).forEach(error => {
+                    error.style.display = 'none';
+                });
+                
+                // Validate each field
+                let isValid = true;
+                
+                if (!document.getElementById('employeeName').value.trim()) {
+                    validationErrors.name.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!document.getElementById('employeeNIN').value.trim()) {
+                    validationErrors.nin.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!document.getElementById('employeeDOB').value) {
+                    validationErrors.dob.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!document.getElementById('employeeQualification').value) {
+                    validationErrors.qualification.style.display = 'block';
+                    isValid = false;
+                }
+                
+                const email = document.getElementById('employeeEmail').value;
+                if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    validationErrors.email.style.display = 'block';
+                    isValid = false;
+                }
+                
+                const phone = document.getElementById('employeePhone').value;
+                if (phone && !/^\d{10}$/.test(phone)) {
+                    validationErrors.phone.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    saveEmployee();
+                }
+            });
+
+            // Reset form
+            document.getElementById('resetFormBtn').addEventListener('click', function() {
+                employeeForm.reset();
+                Object.values(validationErrors).forEach(error => {
+                    error.style.display = 'none';
+                });
+            });
+
+            // Load initial data
+            loadEmployees();
+            loadActivitiesForDeployment();
+            
+            // Collapsible sections
+            const opportunitiesHeading = document.getElementById('opportunitiesHeading');
+            const opportunitiesContent = document.getElementById('opportunitiesContent');
+            const deploymentsHeading = document.getElementById('deploymentsHeading');
+            const deploymentsContent = document.getElementById('deploymentsContent');
+            
+            // Set initial state (collapsed)
+            opportunitiesContent.style.maxHeight = '0';
+            deploymentsContent.style.maxHeight = '0';
+            
+            // Toggle opportunities section
+            opportunitiesHeading.addEventListener('click', function() {
+                if (opportunitiesContent.style.maxHeight === '0px') {
+                    opportunitiesContent.style.maxHeight = opportunitiesContent.scrollHeight + 'px';
+                    loadWorkOpportunities();
+                } else {
+                    opportunitiesContent.style.maxHeight = '0';
+                }
+            });
+            
+            // Toggle deployments section
+            deploymentsHeading.addEventListener('click', function() {
+                if (deploymentsContent.style.maxHeight === '0px') {
+                    deploymentsContent.style.maxHeight = deploymentsContent.scrollHeight + 'px';
+                    loadDeployments();
+                } else {
+                    deploymentsContent.style.maxHeight = '0';
+                }
+            });
+            
+            // Create opportunity button
+            document.getElementById('createOpportunityBtn').addEventListener('click', async function() {
+                const title = document.getElementById('opportunityTitle').value.trim();
+                const description = document.getElementById('opportunityDescription').value.trim();
+                
+                // Reset errors
+                document.getElementById('opportunityTitleError').style.display = 'none';
+                document.getElementById('opportunityDescError').style.display = 'none';
+                
+                let isValid = true;
+                
+                if (!title) {
+                    document.getElementById('opportunityTitleError').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!description) {
+                    document.getElementById('opportunityDescError').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    const btn = document.getElementById('createOpportunityBtn');
+                    const originalText = btn.innerHTML;
+                    
+                    try {
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                        btn.disabled = true;
+                        
+                        const response = await fetch('https://man-m681.onrender.com/work-opportunities/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                title: title,
+                                description: description
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('Failed to create opportunity');
+                        }
+                        
+                        const data = await response.json();
+                        alert('Opportunity created successfully!');
+                        document.getElementById('opportunityTitle').value = '';
+                        document.getElementById('opportunityDescription').value = '';
+                        loadWorkOpportunities();
+                    } catch (error) {
+                        console.error('Error creating opportunity:', error);
+                        alert('Failed to create opportunity. Please try again.');
+                    } finally {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                }
+            });
+            
+            // Function to save employee
+            async function saveEmployee() {
+                const employeeData = {
+                    name: document.getElementById('employeeName').value.trim(),
+                    nin: document.getElementById('employeeNIN').value.trim(),
+                    dob: document.getElementById('employeeDOB').value,
+                    qualification: document.getElementById('employeeQualification').value,
+                    email: document.getElementById('employeeEmail').value.trim(),
+                    phone: document.getElementById('employeePhone').value.trim(),
+                    profession: document.getElementById('text').value.trim(),
+                    status: 'active'
+                };
+                
+                const submitBtn = employeeForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                try {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    submitBtn.disabled = true;
+                    
+                    console.log('Sending employee data:', employeeData);
+                    
+                    const response = await fetch('https://man-m681.onrender.com/employees/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(employeeData)
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error response:', errorData);
+                        throw new Error(errorData.detail || 'Failed to save employee');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Success response:', data);
+                    
+                    alert('Employee saved successfully!');
+                    employeeForm.reset();
+                    loadEmployees();
+                } catch (error) {
+                    console.error('Error saving employee:', error);
+                    alert(`Error: ${error.message}`);
+                } finally {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+
+            // Function to load employees
+            async function loadEmployees() {
+                try {
+                    const tbody = document.getElementById('employeesTableBody');
+                    tbody.innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr>';
+                    
+                    const response = await fetch('https://man-m681.onrender.com/employees/');
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch employees');
+                    }
+                    
+                    const data = await response.json();
+                    tbody.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No employees found</td></tr>';
+                        return;
+                    }
+                    
+                    data.forEach(employee => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${employee.name}</td>
+                            <td>${employee.nin}</td>
+                            <td>${formatQualification(employee.qualification)}</td>
+                            <td><span class="status-badge ${employee.status === 'active' ? 'active' : 'inactive'}">${employee.status}</span></td>
+                            <td>
+                                <button class="action-btn edit-btn" onclick="editEmployee(${employee.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteEmployee(${employee.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // Populate employee dropdown for deployment
+                    populateEmployeeDropdown(data);
+                } catch (error) {
+                    console.error('Error loading employees:', error);
+                    document.getElementById('employeesTableBody').innerHTML = 
+                        '<tr><td colspan="5" style="text-align: center; color: red;">Failed to load employees</td></tr>';
+                }
+            }
+
+            // Helper function to format qualification
+            function formatQualification(qualification) {
+                const qualifications = {
+                    'primary': 'Primary',
+                    'secondary': 'Secondary',
+                    'diploma': 'Diploma',
+                    'bachelors': "Bachelor's",
+                    'masters': "Master's",
+                    'phd': 'PhD',
+                    'other': 'Other'
+                };
+                return qualifications[qualification] || qualification;
+            }
+
+            // Function to populate employee dropdown
+            function populateEmployeeDropdown(employees) {
+                const dropdown = document.getElementById('deployEmployee');
+                dropdown.innerHTML = '<option value="">Select employee</option>';
+                
+                employees.forEach(employee => {
+                    const option = document.createElement('option');
+                    option.value = employee.id;
+                    option.textContent = employee.name;
+                    dropdown.appendChild(option);
+                });
+                
+                // Also populate the assign employee dropdown
+                const assignDropdown = document.getElementById('employeeToAssign');
+                assignDropdown.innerHTML = '<option value="">Select employee</option>';
+                employees.forEach(employee => {
+                    const option = document.createElement('option');
+                    option.value = employee.id;
+                    option.textContent = employee.name;
+                    assignDropdown.appendChild(option);
+                });
+            }
+
+            // Function to load activities for deployment
+            async function loadActivitiesForDeployment() {
+                try {
+                    const response = await fetch('https://man-m681.onrender.com/activities/');
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch activities');
+                    }
+                    
+                    const data = await response.json();
+                    const dropdown = document.getElementById('deployActivity');
+                    dropdown.innerHTML = '<option value="">Select activity</option>';
+                    
+                    // Handle both array response and object with activities property
+                    const activities = Array.isArray(data) ? data : (data.activities || []);
+                    
+                    activities.forEach(activity => {
+                        const option = document.createElement('option');
+                        option.value = activity.id;
+                        option.textContent = `${activity.name} (${activity.project_name})`;
+                        dropdown.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading activities:', error);
+                }
+            }
+
+            // Function to deploy employee to activity
+            document.getElementById('deployBtn').addEventListener('click', async function() {
+                const employeeId = document.getElementById('deployEmployee').value;
+                const activityId = document.getElementById('deployActivity').value;
+                const role = document.getElementById('deployRole').value;
+                
+                if (!employeeId || !activityId) {
+                    alert('Please select both employee and activity');
+                    return;
+                }
+                
+                try {
+                    const btn = document.getElementById('deployBtn');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deploying...';
+                    btn.disabled = true;
+                    
+                    const response = await fetch('https://man-m681.onrender.com/deployments/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            employee_id: employeeId,
+                            activity_id: activityId,
+                            role: role
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to create deployment');
+                    }
+                    
+                    const data = await response.json();
+                    alert('Employee deployed successfully!');
+                    loadDeployments();
+                } catch (error) {
+                    console.error('Error deploying employee:', error);
+                    alert('Failed to deploy employee. Please try again.');
+                } finally {
+                    const btn = document.getElementById('deployBtn');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+
+            // Function to load deployments
+            async function loadDeployments() {
+                try {
+                    const response = await fetch('https://man-m681.onrender.com/deployments/');
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch deployments');
+                    }
+                    
+                    const data = await response.json();
+                    const deploymentList = document.getElementById('deploymentList');
+                    
+                    // Clear existing content except the heading
+                    deploymentList.innerHTML = '<h3>Current Deployments</h3>';
+                    
+                    if (data.length === 0) {
+                        deploymentList.innerHTML += '<p>No current deployments</p>';
+                        return;
+                    }
+                    
+                    data.forEach(deployment => {
+                        const deploymentItem = document.createElement('div');
+                        deploymentItem.className = 'deployment-item';
+                        deploymentItem.innerHTML = `
+                            <div class="deployment-info">
+                                <div class="deployment-employee">${deployment.employee_name}</div>
+                                <div class="deployment-activity">
+                                    <span><i class="fas fa-tasks"></i> ${deployment.activity_name}</span>
+                                </div>
+                                <div class="deployment-project">
+                                    <span><i class="fas fa-project-diagram"></i> ${deployment.project_name}</span>
+                                    <span><i class="fas fa-user-tag"></i> ${formatRole(deployment.role)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="deployment-actions">
+                                <button class="action-btn edit-btn" onclick="editDeployment(${deployment.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteDeployment(${deployment.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                        deploymentList.appendChild(deploymentItem);
+                    });
+                } catch (error) {
+                    console.error('Error loading deployments:', error);
+                    document.getElementById('deploymentList').innerHTML = 
+                        '<h3>Current Deployments</h3><p style="color: red;">Failed to load deployments</p>';
+                }
+            }
+
+            // Helper function to format role
+            function formatRole(role) {
+                const roles = {
+                    'team_leader': 'Team Leader',
+                    'field_officer': 'Field Officer',
+                    'trainer': 'Trainer',
+                    'monitor': 'Monitor',
+                    'other': 'Other'
+                };
+                return roles[role] || role;
+            }
+
+            // Initialize with loading deployments
+            loadDeployments();
+            
+            // Assign Employee Modal
+            const assignEmployeeModal = document.getElementById('assignEmployeeModal');
+            const assignEmployeeForm = document.getElementById('assignEmployeeForm');
+            const cancelAssignBtn = document.getElementById('cancelAssignBtn');
+            
+            // This will be called when "Assign Employee" button is clicked
+            window.openAssignEmployeeModal = function(opportunityId) {
+                document.getElementById('currentOpportunityId').value = opportunityId;
+                assignEmployeeModal.style.display = 'block';
+            };
+            
+            cancelAssignBtn.addEventListener('click', function() {
+                assignEmployeeModal.style.display = 'none';
+                assignEmployeeForm.reset();
+            });
+            
+            assignEmployeeForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const employeeId = document.getElementById('employeeToAssign').value;
+                const opportunityId = document.getElementById('currentOpportunityId').value;
+                
+                // Reset error
+                document.getElementById('assignEmployeeError').style.display = 'none';
+                
+                if (!employeeId) {
+                    document.getElementById('assignEmployeeError').style.display = 'block';
+                    return;
+                }
+                
+                const submitBtn = assignEmployeeForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                try {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Assigning...';
+                    submitBtn.disabled = true;
+                    
+                    const response = await fetch('https://man-m681.onrender.com/opportunity-assignments/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            opportunity_id: opportunityId,
+                            employee_id: employeeId
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to assign employee');
+                    }
+                    
+                    const data = await response.json();
+                    alert('Employee assigned successfully!');
+                    assignEmployeeForm.reset();
+                    assignEmployeeModal.style.display = 'none';
+                    loadWorkOpportunities();
+                } catch (error) {
+                    console.error('Error assigning employee:', error);
+                    alert('Failed to assign employee. Please try again.');
+                } finally {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === assignEmployeeModal) {
+                    assignEmployeeModal.style.display = 'none';
+                    assignEmployeeForm.reset();
+                }
+            });
+            
+            // Close modal with X button
+            document.querySelectorAll('.close-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    assignEmployeeModal.style.display = 'none';
+                    assignEmployeeForm.reset();
+                });
+            });
+            
+            // Load work opportunities when page loads
+            loadWorkOpportunities();
+            
+            // Expose functions to global scope
+            window.editEmployee = editEmployee;
+            window.deleteEmployee = deleteEmployee;
+            window.editDeployment = editDeployment;
+            window.deleteDeployment = deleteDeployment;
+        });
+
+        // Edit employee function
+        async function editEmployee(employeeId) {
+            try {
+                const response = await fetch(`https://man-m681.onrender.com/employees/${employeeId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch employee');
+                }
+                
+                const employee = await response.json();
+                
+                // Populate form
+                document.getElementById('employeeName').value = employee.name;
+                document.getElementById('employeeNIN').value = employee.nin;
+                document.getElementById('employeeDOB').value = employee.dob;
+                document.getElementById('employeeQualification').value = employee.qualification;
+                document.getElementById('employeeEmail').value = employee.email || '';
+                document.getElementById('employeePhone').value = employee.phone || '';
+                document.getElementById('text').value = employee.profession || '';
+                
+                // Change form title and button
+                document.querySelector('.employee-form-container .section-title').textContent = 'Edit Employee';
+                document.getElementById('employeeForm').querySelector('button[type="submit"]').textContent = 'Update Employee';
+                
+                // Scroll to form
+                document.querySelector('.employee-form-container').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Error editing employee:', error);
+                alert('Failed to load employee for editing');
+            }
+        }
+
+        // Delete employee function
+        async function deleteEmployee(employeeId) {
+            if (!confirm('Are you sure you want to delete this employee?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`https://man-m681.onrender.com/employees/${employeeId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete employee');
+                }
+                
+                alert('Employee deleted successfully');
+                document.querySelector(`#employeesTable tbody tr[data-id="${employeeId}"]`)?.remove();
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                alert('Failed to delete employee');
+            }
+        }
+
+        // Edit deployment function
+        async function editDeployment(deploymentId) {
+            alert(`Edit deployment ${deploymentId} functionality will be implemented`);
+        }
+
+        // Delete deployment function
+        async function deleteDeployment(deploymentId) {
+            if (!confirm('Are you sure you want to remove this deployment?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`https://man-m681.onrender.com/deployments/${deploymentId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete deployment');
+                }
+                
+                alert('Deployment removed successfully');
+                document.querySelector(`.deployment-item[data-id="${deploymentId}"]`)?.remove();
+            } catch (error) {
+                console.error('Error deleting deployment:', error);
+                alert('Failed to delete deployment');
+            }
+        }
+
+        // Function to load work opportunities
+        async function loadWorkOpportunities() {
+            try {
+                const opportunityList = document.getElementById('opportunityList');
+                
+                // Clear existing cards except the header
+                opportunityList.innerHTML = '<h3>Current Opportunities</h3>';
+                
+                // Show loading state
+                const loadingElement = document.createElement('div');
+                loadingElement.className = 'loading';
+                loadingElement.innerHTML = '<div class="spinner"></div>';
+                opportunityList.appendChild(loadingElement);
+                
+                // Fetch opportunities
+                const response = await fetch('https://man-m681.onrender.com/work-opportunities/');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch work opportunities');
+                }
+                
+                const opportunities = await response.json();
+                
+                // Remove loading element
+                loadingElement.remove();
+                
+                if (opportunities.length === 0) {
+                    opportunityList.innerHTML += '<p>No work opportunities found</p>';
+                    return;
+                }
+                
+                // Create cards for each opportunity
+                for (const opportunity of opportunities) {
+                    // Get assignments for this opportunity
+                    let assignments = [];
+                    try {
+                        const assignmentsResponse = await fetch(`https://man-m681.onrender.com/opportunity-assignments/${opportunity.id}`);
+                        if (assignmentsResponse.ok) {
+                            assignments = await assignmentsResponse.json();
+                        }
+                    } catch (error) {
+                        console.error(`Error loading assignments for opportunity ${opportunity.id}:`, error);
+                    }
+                    
+                    const opportunityCard = document.createElement('div');
+                    opportunityCard.className = 'opportunity-card';
+                    opportunityCard.innerHTML = `
+                        <div class="opportunity-header">
+                            <h3 class="opportunity-title">${opportunity.title}</h3>
+                            <div class="opportunity-meta">
+                                <span><i class="fas fa-calendar-alt"></i> ${new Date(opportunity.created_at).toLocaleDateString()}</span>
+                                <span><i class="fas fa-circle" style="color: ${opportunity.status === 'open' ? '#2ecc71' : '#e74c3c'}"></i> ${opportunity.status}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="opportunity-description">
+                            ${opportunity.description}
+                        </div>
+                        
+                        <div class="opportunity-footer">
+                            <div class="assigned-employees">
+                                <span>Assigned:</span>
+                                ${assignments.slice(0, 3).map(assignment => `
+                                    <div class="employee-avatar" title="${assignment.employee_name}">
+                                        ${getInitials(assignment.employee_name)}
+                                    </div>
+                                `).join('')}
+                                ${assignments.length > 3 ? `<div class="employee-avatar">+${assignments.length - 3}</div>` : ''}
+                                ${assignments.length === 0 ? '<span>None</span>' : ''}
+                            </div>
+                            
+                            <button class="btn btn-primary btn-sm" onclick="openAssignEmployeeModal(${opportunity.id})">
+                                <i class="fas fa-plus"></i> Assign Employee
+                            </button>
+                        </div>
+                    `;
+                    
+                    opportunityList.appendChild(opportunityCard);
+                }
+            } catch (error) {
+                console.error('Error loading work opportunities:', error);
+                const opportunityList = document.getElementById('opportunityList');
+                opportunityList.innerHTML = '<h3>Current Opportunities</h3>';
+                const errorElement = document.createElement('p');
+                errorElement.style.color = 'red';
+                errorElement.textContent = 'Failed to load work opportunities';
+                opportunityList.appendChild(errorElement);
+            }
+        }
+
+        // Helper function to get initials from name
+        function getInitials(name) {
+            return name.split(' ').map(part => part[0]).join('').toUpperCase().substring(0, 2);
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+    // Initialize payment functionality if on HR dashboard
+    if (document.getElementById('createPaymentBtn')) {
+        initPaymentProcessing();
+    }
+    
+    // Initialize approval functionality if on Director dashboard
+    if (document.getElementById('approvalStatusFilter')) {
+        initPaymentApprovals();
+    }
+});
+        // Payment Processing Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.payment-tab-btn');
+    const tabContents = document.querySelectorAll('.payment-tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all buttons and contents
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+            
+            // Load content for the active tab
+            switch(tabId) {
+                case 'request-payment':
+                    loadEmployeesForPayment();
+                    break;
+                case 'pending-approvals':
+                    loadPendingPayments();
+                    break;
+                case 'payment-history':
+                    loadPaymentHistory();
+                    break;
+            }
+        });
+    });
+    
+    // Form submission for payment request
+    document.getElementById('paymentRequestForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const employeeId = document.getElementById('paymentEmployee').value;
+        const amount = parseFloat(document.getElementById('paymentAmount').value);
+        const paymentPeriod = document.getElementById('paymentPeriod').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const description = document.getElementById('paymentDescription').value;
+        
+        if (!employeeId || !amount || !paymentPeriod || !paymentMethod) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        try {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+            
+            const response = await fetch('https://man-m681.onrender.com/payments/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    employee_id: parseInt(employeeId),
+                    amount: amount,
+                    payment_period: paymentPeriod,
+                    description: description,
+                    payment_method: paymentMethod
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to submit payment request');
+            }
+            
+            const data = await response.json();
+            alert('Payment request submitted successfully!');
+            this.reset();
+            
+            // Refresh pending payments tab
+            loadPendingPayments();
+        } catch (error) {
+            console.error('Error submitting payment request:', error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            const submitBtn = document.querySelector('#paymentRequestForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
+                submitBtn.disabled = false;
+            }
+        }
+    });
+    
+    // Load employees for payment dropdown
+    async function loadEmployeesForPayment() {
+        try {
+            const response = await fetch('https://man-m681.onrender.com/employees/');
+            if (!response.ok) throw new Error('Failed to fetch employees');
+            
+            const data = await response.json();
+            const dropdown = document.getElementById('paymentEmployee');
+            dropdown.innerHTML = '<option value="">Select Employee</option>';
+            
+            data.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = employee.id;
+                option.textContent = `${employee.name} (${employee.nin})`;
+                dropdown.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading employees:', error);
+            alert('Failed to load employee list');
+        }
+    }
+    
+    // Load pending payments
+    async function loadPendingPayments() {
+        try {
+            const tbody = document.getElementById('pendingPaymentsBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading"><div class="spinner"></div></td></tr>';
+            
+            const response = await fetch('https://man-m681.onrender.com/payments/pending');
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch pending payments');
+            }
+            
+            const payments = await response.json();
+            tbody.innerHTML = '';
+            
+            if (payments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No pending payments found</td></tr>';
+                return;
+            }
+            
+            payments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${payment.employee_name}</td>
+                    <td>UGX ${payment.amount.toLocaleString()}</td>
+                    <td>${payment.payment_period}</td>
+                    <td>${formatPaymentMethod(payment.payment_method)}</td>
+                    <td>${new Date(payment.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn approve-btn" onclick="openApprovalModal(${payment.id}, '${payment.employee_name}', ${payment.amount}, '${payment.payment_period}', '${new Date(payment.created_at).toLocaleDateString()}')">
+                            <i class="fas fa-check-circle"></i> Process
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Initialize search functionality
+            document.getElementById('pendingSearch').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = tbody.querySelectorAll('tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+        } catch (error) {
+            console.error('Error loading pending payments:', error);
+            document.getElementById('pendingPaymentsBody').innerHTML = 
+                '<tr><td colspan="6" style="text-align: center; color: red;">Failed to load pending payments</td></tr>';
+        }
+    }
+    
+    // Load payment history
+    async function loadPaymentHistory(statusFilter = '') {
+        try {
+            const tbody = document.getElementById('paymentHistoryBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading"><div class="spinner"></div></td></tr>';
+            
+            let url = 'https://man-m681.onrender.com/payments/history';
+            if (statusFilter) {
+                url += `?status=${statusFilter}`;
+            }
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch payment history');
+            }
+            
+            const payments = await response.json();
+            tbody.innerHTML = '';
+            
+            if (payments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No payment history found</td></tr>';
+                return;
+            }
+            
+            payments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${payment.employee_name}</td>
+                    <td>UGX ${payment.amount.toLocaleString()}</td>
+                    <td>${payment.payment_period}</td>
+                    <td><span class="status-badge ${payment.status}">${payment.status}</span></td>
+                    <td>${new Date(payment.created_at).toLocaleDateString()}</td>
+                    <td>${payment.approved_at ? new Date(payment.approved_at).toLocaleDateString() : 'N/A'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Initialize search functionality
+            document.getElementById('historySearch').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = tbody.querySelectorAll('tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+            
+            // Status filter change
+            document.getElementById('historyStatusFilter').addEventListener('change', function() {
+                loadPaymentHistory(this.value);
+            });
+        } catch (error) {
+            console.error('Error loading payment history:', error);
+            document.getElementById('paymentHistoryBody').innerHTML = 
+                '<tr><td colspan="6" style="text-align: center; color: red;">Failed to load payment history</td></tr>';
+        }
+    }
+    
+    // Helper function to format payment method
+    function formatPaymentMethod(method) {
+        const methodMap = {
+            'bank_transfer': 'Bank Transfer',
+            'mobile_money': 'Mobile Money',
+            'cash': 'Cash'
+        };
+        return methodMap[method] || method;
+    }
+});
+
+// Open approval modal
+function openApprovalModal(paymentId, employeeName, amount, period, requestDate) {
+    const modal = document.getElementById('approvalModal');
+    document.getElementById('approvalPaymentId').value = paymentId;
+    document.getElementById('modalEmployee').textContent = employeeName;
+    document.getElementById('modalAmount').textContent = `UGX ${amount.toLocaleString()}`;
+    document.getElementById('modalPeriod').textContent = period;
+    document.getElementById('modalRequestDate').textContent = requestDate;
+    
+    modal.style.display = 'block';
+}
+
+// Close modal when clicking X
+document.querySelector('#approvalModal .close-btn').addEventListener('click', function() {
+    document.getElementById('approvalModal').style.display = 'none';
+});
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('approvalModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+});
+
+// Approve payment
+document.getElementById('approveBtn').addEventListener('click', async function() {
+    await processApproval(true);
+});
+
+// Reject payment
+document.getElementById('rejectBtn').addEventListener('click', async function() {
+    await processApproval(false);
+});
+
+// Process approval/rejection
+async function processApproval(approve) {
+    const paymentId = document.getElementById('approvalPaymentId').value;
+    const remarks = document.getElementById('approvalRemarks').value;
+    
+    if (!paymentId) {
+        alert('Invalid payment ID');
+        return;
+    }
+    
+    try {
+        const btn = approve ? document.getElementById('approveBtn') : document.getElementById('rejectBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
+        
+        const response = await fetch('https://man-m681.onrender.com/payments/approve', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                payment_id: parseInt(paymentId),
+                approved: approve,
+                remarks: remarks
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to process approval');
+        }
+        
+        const data = await response.json();
+        alert(data.message);
+        
+        // Close modal and refresh data
+        document.getElementById('approvalModal').style.display = 'none';
+        document.getElementById('approvalRemarks').value = '';
+        
+        // Refresh both pending and history tabs
+        loadPendingPayments();
+        loadPaymentHistory();
+    } catch (error) {
+        console.error('Error processing approval:', error);
+        alert(`Error: ${error.message}`);
+    } finally {
+        const approveBtn = document.getElementById('approveBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+        approveBtn.innerHTML = '<i class="fas fa-check"></i> Approve';
+        approveBtn.disabled = false;
+        rejectBtn.innerHTML = '<i class="fas fa-times"></i> Reject';
+        rejectBtn.disabled = false;
+    }
+}
+
+// Initialize payment tabs when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Set the first tab as active by default
+    document.querySelector('.payment-tab-btn').classList.add('active');
+    document.querySelector('.payment-tab-content').classList.add('active');
+    
+    // Load initial data for the first tab
+    loadEmployeesForPayment();
+});
+    </script>
+</body>
+</html>

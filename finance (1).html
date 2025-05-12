@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Budget Viewer | RCDNET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Modern Header Styles */
+        .header {
+            background-color: white;
+            height: var(--header-height);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtext {
+            font-size: 0.9rem;
+            color: #777;
+            font-weight: 400;
+            margin-left: 5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: var(--header-height);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Activity Selection Section */
+        .selection-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: white;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Budget Section */
+        .budget-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        /* Budget Table Styles */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .budget-table th, 
+        .budget-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .budget-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .budget-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .budget-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .budget-total {
+            font-weight: bold;
+            text-align: right;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 2px solid #ddd;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Activity Info */
+        .activity-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .activity-info-item {
+            margin-bottom: 10px;
+            display: flex;
+        }
+
+        .activity-info-label {
+            font-weight: 600;
+            min-width: 120px;
+            color: #555;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        .status-badge.active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .status-badge.planned {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.2);
+        }
+
+        .status-badge.completed {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #7f8c8d;
+            border: 1px solid rgba(149, 165, 166, 0.2);
+        }
+
+        .status-badge.in_progress {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        /* Loading state */
+        .loading {
+            padding: 20px;
+            text-align: center;
+            color: #777;
+        }
+
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 15px;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .activity-info-item {
+                flex-direction: column;
+            }
+            
+            .activity-info-label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div>
+                    <span class="logo-text">RCDNET</span>
+                    
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="user-name">Finance</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-content">
+            <h1 class="page-title">
+                <i class="fas fa-file-invoice-dollar"></i>
+                Activity Budget Viewer
+            </h1>
+
+            <div class="selection-section">
+                <div class="form-group">
+                    <label for="projectSelect">Select Project</label>
+                    <select id="projectSelect">
+                        <option value="">Loading projects...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="activitySelect">Select Activity</label>
+                    <select id="activitySelect" disabled>
+                        <option value="">Please select a project first</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="viewBudgetBtn" disabled>
+                    <i class="fas fa-eye"></i> View Budget
+                </button>
+            </div>
+
+            <div class="budget-section" id="budgetSection" style="display: none;">
+                <div class="activity-info" id="activityInfo">
+                    <!-- Activity details will be loaded here -->
+                </div>
+                
+                <div class="section-header">
+                    <h2 class="section-title">Budget Details</h2>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="budget-table" id="budgetTable">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Unit Price (UGX)</th>
+                                <th>Total (UGX)</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budgetTableBody">
+                            <!-- Budget items will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="budget-total" id="budgetTotal">
+                    Total Budget: UGX 0
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const projectSelect = document.getElementById('projectSelect');
+            const activitySelect = document.getElementById('activitySelect');
+            const viewBudgetBtn = document.getElementById('viewBudgetBtn');
+            const budgetSection = document.getElementById('budgetSection');
+            const budgetTableBody = document.getElementById('budgetTableBody');
+            const budgetTotal = document.getElementById('budgetTotal');
+            const activityInfo = document.getElementById('activityInfo');
+            
+            // Variables
+            let currentActivityId = null;
+            let activities = [];
+            
+            // Event Listeners
+            projectSelect.addEventListener('change', loadActivitiesForProject);
+            viewBudgetBtn.addEventListener('click', viewActivityBudget);
+            
+            // Initialize the page
+            loadProjects();
+            
+            // Functions
+            function loadProjects() {
+                fetch('https://man-m681.onrender.com/projects/')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch projects');
+                        return response.json();
+                    })
+                    .then(data => {
+                        projectSelect.innerHTML = '<option value="">Select a project</option>';
+                        
+                        if (data.projects && data.projects.length > 0) {
+                            data.projects.forEach(project => {
+                                const option = document.createElement('option');
+                                option.value = project.id;
+                                option.textContent = project.name;
+                                projectSelect.appendChild(option);
+                            });
+                        } else {
+                            projectSelect.innerHTML = '<option value="">No projects available</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading projects:', error);
+                        projectSelect.innerHTML = '<option value="">Failed to load projects</option>';
+                    });
+            }
+            
+            function loadActivitiesForProject() {
+                const projectId = projectSelect.value;
+                
+                if (!projectId) {
+                    activitySelect.innerHTML = '<option value="">Please select a project first</option>';
+                    activitySelect.disabled = true;
+                    viewBudgetBtn.disabled = true;
+                    return;
+                }
+                
+                activitySelect.innerHTML = '<option value="">Loading activities...</option>';
+                activitySelect.disabled = true;
+                viewBudgetBtn.disabled = true;
+                
+                fetch(`https://man-m681.onrender.com/activities/`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch activities');
+                        return response.json();
+                    })
+                    .then(data => {
+                        activities = data.filter(activity => activity.project_id == projectId);
+                        
+                        activitySelect.innerHTML = '<option value="">Select an activity</option>';
+                        
+                        if (activities.length > 0) {
+                            activities.forEach(activity => {
+                                const option = document.createElement('option');
+                                option.value = activity.id;
+                                option.textContent = activity.name;
+                                activitySelect.appendChild(option);
+                            });
+                            
+                            activitySelect.disabled = false;
+                        } else {
+                            activitySelect.innerHTML = '<option value="">No activities available for this project</option>';
+                            activitySelect.disabled = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading activities:', error);
+                        activitySelect.innerHTML = '<option value="">Failed to load activities</option>';
+                        activitySelect.disabled = true;
+                    });
+            }
+            
+            function viewActivityBudget() {
+                currentActivityId = activitySelect.value;
+                
+                if (!currentActivityId) {
+                    alert('Please select an activity first');
+                    return;
+                }
+                
+                // Find the selected activity
+                const selectedActivity = activities.find(activity => activity.id == currentActivityId);
+                
+                if (!selectedActivity) {
+                    alert('Activity not found');
+                    return;
+                }
+                
+                // Display activity info
+                activityInfo.innerHTML = `
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Activity Name:</span>
+                        <span>${selectedActivity.name}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Project:</span>
+                        <span>${selectedActivity.project_name}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Status:</span>
+                        <span class="status-badge ${selectedActivity.status}">${selectedActivity.status.replace('_', ' ')}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Start Date:</span>
+                        <span>${selectedActivity.start_date}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">End Date:</span>
+                        <span>${selectedActivity.end_date}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Description:</span>
+                        <span>${selectedActivity.description || 'No description available'}</span>
+                    </div>
+                `;
+                
+                // Load budget items for the project (since activities share the project budget)
+                loadBudgetItems(selectedActivity.project_id);
+                
+                // Show the budget section
+                budgetSection.style.display = 'block';
+                
+                // Scroll to the budget section
+                budgetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function loadBudgetItems(projectId) {
+                budgetTableBody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i> Loading budget items...</td></tr>';
+                
+                fetch(`https://man-m681.onrender.com/budget-items/${projectId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch budget items');
+                        return response.json();
+                    })
+                    .then(items => {
+                        budgetTableBody.innerHTML = '';
+                        
+                        if (items.length === 0) {
+                            budgetTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No budget items found for this activity</td></tr>';
+                            budgetTotal.textContent = 'Total Budget: UGX 0';
+                            return;
+                        }
+                        
+                        let totalBudget = 0;
+                        
+                        items.forEach(item => {
+                            totalBudget += item.total;
+                            
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${item.item_name}</td>
+                                <td>${item.category}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.unit_price.toLocaleString()}</td>
+                                <td>${item.total.toLocaleString()}</td>
+                                <td>${item.description || '-'}</td>
+                            `;
+                            budgetTableBody.appendChild(row);
+                        });
+                        
+                        budgetTotal.textContent = `Total Budget: UGX ${totalBudget.toLocaleString()}`;
+                    })
+                    .catch(error => {
+                        console.error('Error loading budget items:', error);
+                        budgetTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--accent-color);">Failed to load budget items</td></tr>';
+                    });
+            }
+            
+            // Enable view button when activity is selected
+            activitySelect.addEventListener('change', function() {
+                viewBudgetBtn.disabled = !this.value;
+            });
+        });
+    </script>
+</body>
+</html>

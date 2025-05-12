@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundraising Documents</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* File Manager Styles */
+        .file-manager-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .file-manager-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .file-manager-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .file-manager-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .file-manager-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb-item {
+            color: #3498db;
+            cursor: pointer;
+        }
+
+        .breadcrumb-item:hover {
+            text-decoration: underline;
+        }
+
+        .file-manager-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .file-item, .folder-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-item:hover, .folder-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .file-icon, .folder-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 2rem;
+        }
+
+        .file-icon {
+            color: #3498db;
+        }
+
+        .folder-icon {
+            color: #f39c12;
+        }
+
+        .file-name, .folder-name {
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="file-manager-container">
+        <div class="file-manager-header">
+            <h1>
+                <i class="fas fa-folder-open"></i>
+                Fundraising Documents
+            </h1>
+            <div class="file-manager-actions">
+                <button class="file-manager-btn" id="uploadFilesBtn">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <button class="file-manager-btn" id="createFolderBtn">
+                    <i class="fas fa-folder-plus"></i> New Folder
+                </button>
+            </div>
+        </div>
+
+        <div class="breadcrumb" id="breadcrumb">
+            <span class="breadcrumb-item" data-path="">Fundraising Documents</span>
+        </div>
+
+        <div class="file-manager-grid" id="fileManagerGrid">
+            <!-- Folders -->
+            <div class="folder-item" data-folder-id="1" data-folder-name="Proposals">
+                <div class="folder-icon">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div class="folder-name">Proposals</div>
+            </div>
+
+            <div class="folder-item" data-folder-id="2" data-folder-name="Reports">
+                <div class="folder-icon">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div class="folder-name">Reports</div>
+            </div>
+
+            <!-- Files -->
+            <div class="file-item" data-file-id="1" data-file-name="Annual_Report_2023.pdf">
+                <div class="file-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="file-name">Annual_Report_2023.pdf</div>
+            </div>
+
+            <div class="file-item" data-file-id="2" data-file-name="Budget_2024.xlsx">
+                <div class="file-icon">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+                <div class="file-name">Budget_2024.xlsx</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let currentPath = [];
+
+            // Setup folder click handlers
+            document.querySelectorAll('.folder-item').forEach(folder => {
+                folder.addEventListener('click', function() {
+                    const folderId = this.getAttribute('data-folder-id');
+                    const folderName = this.getAttribute('data-folder-name');
+                    navigateToFolder(folderId, folderName);
+                });
+            });
+
+            // Setup file click handlers
+            document.querySelectorAll('.file-item').forEach(file => {
+                file.addEventListener('click', function() {
+                    const fileId = this.getAttribute('data-file-id');
+                    const fileName = this.getAttribute('data-file-name');
+                    openFile(fileId, fileName);
+                });
+            });
+
+            // Setup breadcrumb click handlers
+            document.querySelectorAll('.breadcrumb-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const path = this.getAttribute('data-path');
+                    navigateToFolder(path, '');
+                });
+            });
+
+            // Setup button click handlers
+            document.getElementById('uploadFilesBtn').addEventListener('click', function() {
+                alert('Upload files functionality will go here');
+            });
+
+            document.getElementById('createFolderBtn').addEventListener('click', function() {
+                const folderName = prompt('Enter folder name:');
+                if (folderName) {
+                    createFolder(folderName);
+                }
+            });
+
+            // Navigation functions
+            function navigateToFolder(folderId, folderName) {
+                if (folderId) {
+                    currentPath.push({ id: folderId, name: folderName });
+                } else {
+                    currentPath = [];
+                }
+                updateBreadcrumb();
+                loadFolderContents(folderId);
+            }
+
+            function updateBreadcrumb() {
+                const breadcrumb = document.getElementById('breadcrumb');
+                breadcrumb.innerHTML = '';
+                
+                // Add root item
+                const rootItem = document.createElement('span');
+                rootItem.className = 'breadcrumb-item';
+                rootItem.setAttribute('data-path', '');
+                rootItem.textContent = 'Fundraising Documents';
+                breadcrumb.appendChild(rootItem);
+                
+                // Add current path items
+                currentPath.forEach((folder, index) => {
+                    const separator = document.createElement('span');
+                    separator.className = 'breadcrumb-separator';
+                    separator.textContent = '›';
+                    breadcrumb.appendChild(separator);
+                    
+                    const item = document.createElement('span');
+                    item.className = 'breadcrumb-item';
+                    item.setAttribute('data-path', folder.id);
+                    item.textContent = folder.name;
+                    breadcrumb.appendChild(item);
+                });
+            }
+
+            function loadFolderContents(folderId) {
+                alert(`Loading contents for folder: ${folderId || 'Root'}`);
+                // In a real app, this would fetch contents from the server
+            }
+
+            function openFile(fileId, fileName) {
+                alert(`Opening file: ${fileName}`);
+                // In a real app, this would open the file preview
+            }
+
+            function createFolder(folderName) {
+                alert(`Creating folder: ${folderName}`);
+                // In a real app, this would create the folder on the server
+                // Then add it to the UI
+                const folderId = Date.now(); // Temporary ID
+                
+                const folderItem = document.createElement('div');
+                folderItem.className = 'folder-item';
+                folderItem.setAttribute('data-folder-id', folderId);
+                folderItem.setAttribute('data-folder-name', folderName);
+                folderItem.innerHTML = `
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-name">${folderName}</div>
+                `;
+                
+                folderItem.addEventListener('click', function() {
+                    navigateToFolder(folderId, folderName);
+                });
+                
+                document.getElementById('fileManagerGrid').prepend(folderItem);
+            }
+        });
+    </script>
+</body>
+</html>
