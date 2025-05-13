@@ -9,6 +9,27 @@ document.addEventListener('DOMContentLoaded', function() {
     setupDonationsPage();
 });
 
+function loadInitialDonationsData() {
+    // Load data based on active tab
+    const activeTab = document.querySelector('.donations-tabs .tab-btn.active');
+    if (!activeTab) return;
+    
+    const tabId = activeTab.getAttribute('data-tab');
+    switch(tabId) {
+        case 'donationHistory':
+            loadDonations();
+            break;
+        case 'receipts':
+            loadReceipts();
+            break;
+        case 'donorProfiles':
+            loadDonorProfiles();
+            break;
+    }
+    
+    // Load dashboard summary to update cards
+    loadDashboardSummary();
+}
 function setupDonationsPage() {
     // Initialize tab switching
     setupTabSwitching();
@@ -693,7 +714,9 @@ async function loadDonorDonations(donorId) {
         if (!response.ok) throw new Error('Failed to fetch donor donations');
         
         const data = await response.json();
-        const tbody = document.getElementById('donorDonationsTable').querySelector('tbody');
+        const tbody = document.getElementById('donorDonationsTable')?.querySelector('tbody');
+        if (!tbody) return;
+        
         tbody.innerHTML = '';
         
         if (data.donations.length === 0) {
@@ -702,31 +725,31 @@ async function loadDonorDonations(donorId) {
             data.donations.forEach(donation => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${donation.date}</td>
+                    <td>${formatDate(donation.date)}</td>
                     <td>UGX ${donation.amount.toLocaleString()}</td>
-                    <td>${donation.project}</td>
-                    <td><span class="status-badge completed">${donation.status}</span></td>
+                    <td>${donation.project || 'General Fund'}</td>
+                    <td><span class="status-badge completed">${donation.status || 'Completed'}</span></td>
                 `;
                 tbody.appendChild(row);
             });
         }
         
         // Update stats
-        document.getElementById('totalDonations').textContent = `UGX ${data.total_donations.toLocaleString()}`;
-        document.getElementById('donationCount').textContent = data.donation_count;
+        document.getElementById('totalDonations').textContent = `UGX ${data.total_donations?.toLocaleString() || '0'}`;
+        document.getElementById('donationCount').textContent = data.donation_count || '0';
         
         if (data.donations.length > 0) {
             const dates = data.donations.map(d => new Date(d.date));
             dates.sort((a, b) => a - b);
-            document.getElementById('firstDonation').textContent = dates[0].toLocaleDateString();
-            document.getElementById('lastDonation').textContent = dates[dates.length - 1].toLocaleDateString();
+            document.getElementById('firstDonation').textContent = formatDate(dates[0]);
+            document.getElementById('lastDonation').textContent = formatDate(dates[dates.length - 1]);
         } else {
             document.getElementById('firstDonation').textContent = '-';
             document.getElementById('lastDonation').textContent = '-';
         }
     } catch (error) {
         console.error('Error loading donor donations:', error);
-        alert('Failed to load donation history. Please try again.');
+        showToast('Failed to load donation history. Please try again.', 'error');
     }
 }
 
