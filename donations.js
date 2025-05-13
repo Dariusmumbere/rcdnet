@@ -88,8 +88,8 @@ function setupTabSwitching() {
 // Donation CRUD operations
 async function loadDonations() {
     try {
-        const donationsTable = document.querySelector('.donations-table tbody');
-        donationsTable.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading donations...</td></tr>';
+        const donationsTableBody = document.getElementById('donationsTableBody');
+        donationsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading donations...</td></tr>';
         
         const response = await fetch('https://man-m681.onrender.com/donations/');
         
@@ -98,15 +98,12 @@ async function loadDonations() {
         }
         
         const data = await response.json();
-        donationsTable.innerHTML = '';
+        donationsTableBody.innerHTML = '';
         
         // Sort donations by date (newest first)
         data.sort((a, b) => new Date(b.date) - new Date(a.date));
         
-        // Display only the most recent donations (e.g., last 10)
-        const recentDonations = data.slice(0, 10);
-        
-        recentDonations.forEach(donation => {
+        data.forEach(donation => {
             const row = document.createElement('tr');
             row.setAttribute('data-donation-id', donation.id);
             row.innerHTML = `
@@ -117,16 +114,23 @@ async function loadDonations() {
                 <td>${donation.project || 'General Fund'}</td>
                 <td><span class="status-badge completed">Completed</span></td>
                 <td>
-                    <button class="action-btn view-btn" onclick="viewDonation(${donation.id})"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-btn" onclick="editDonation(${donation.id})"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete-btn" onclick="deleteDonation(${donation.id})"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn view-btn" onclick="viewDonation(${donation.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit-btn" onclick="editDonation(${donation.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteDonation(${donation.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             `;
-            donationsTable.appendChild(row);
+            donationsTableBody.appendChild(row);
         });
     } catch (error) {
         console.error('Error loading donations:', error);
-        donationsTable.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load donations</td></tr>';
+        document.getElementById('donationsTableBody').innerHTML = 
+            '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load donations</td></tr>';
     }
 }
 
