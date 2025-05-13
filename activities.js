@@ -210,3 +210,400 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Make functions available globally for inline event handlers
 window.createActivity = createActivity;
+
+// Add these functions to your existing JavaScript
+
+// View activity details
+async function viewActivity(activityId) {
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`);
+        if (!response.ok) throw new Error('Failed to fetch activity');
+        
+        const activity = await response.json();
+        
+        // Create a modal to display activity details
+        const modalHTML = `
+            <div class="project-modal show" id="viewActivityModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Activity Details</h3>
+                        <button class="close-btn" onclick="closeModal('viewActivityModal')">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="detail-row">
+                            <span class="detail-label">Name:</span>
+                            <span class="detail-value">${activity.name}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Project:</span>
+                            <span class="detail-value">${activity.project_name || activity.project_id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Description:</span>
+                            <span class="detail-value">${activity.description || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Start Date:</span>
+                            <span class="detail-value">${activity.start_date}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">End Date:</span>
+                            <span class="detail-value">${activity.end_date}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Budget:</span>
+                            <span class="detail-value">UGX ${activity.budget ? activity.budget.toLocaleString() : '0'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value"><span class="status-badge ${activity.status ? activity.status.replace(' ', '_') : 'planned'}">
+                                ${activity.status || 'Planned'}
+                            </span></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="file-manager-btn" onclick="editActivity(${activity.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="file-manager-btn secondary" onclick="closeModal('viewActivityModal')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add modal to DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    } catch (error) {
+        console.error('Error viewing activity:', error);
+        alert('Failed to view activity details. Please try again.');
+    }
+}
+
+// Edit activity
+async function editActivity(activityId) {
+    try {
+        // Close view modal if open
+        if (document.getElementById('viewActivityModal')) {
+            closeModal('viewActivityModal');
+        }
+        
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`);
+        if (!response.ok) throw new Error('Failed to fetch activity');
+        
+        const activity = await response.json();
+        
+        // Populate the activity form with existing data
+        document.getElementById('activityName').value = activity.name;
+        document.getElementById('activityDescription').value = activity.description || '';
+        document.getElementById('activityStartDate').value = activity.start_date.split('T')[0]; // Format date for input
+        document.getElementById('activityEndDate').value = activity.end_date.split('T')[0];
+        document.getElementById('activityBudget').value = activity.budget || '';
+        document.getElementById('activityStatus').value = activity.status || 'planned';
+        
+        // Load projects and select the current one
+        await loadProjectsForActivities();
+        document.getElementById('activityProject').value = activity.project_id;
+        
+        // Change modal title and button text
+        document.querySelector('#createActivityModal .modal-header h3').textContent = 'Edit Activity';
+        document.querySelector('#createActivityModal .modal-footer .file-manager-btn').textContent = 'Update Activity';
+        
+        // Store activity ID for update
+        document.getElementById('createActivityModal').dataset.activityId = activityId;
+        
+        // Open modal
+        document.getElementById('createActivityModal').classList.add('show');
+    } catch (error) {
+        console.error('Error editing activity:', error);
+        alert('Failed to load activity for editing. Please try again.');
+    }
+}
+
+// Manage activity budget
+async function manageActivityBudget(activityId, activityName) {
+    // Create or show the budget management modal
+    if (!document.getElementById('budgetManagementModal')) {
+        createBudgetManagementModal();
+    }
+    
+    // Set the activity info
+    document.getElementById('budgetForActivityName').textContent = activityName;
+    document.getElementById('budgetManagementModal').dataset.activityId = activityId;
+    
+    // Load existing budget items
+    await loadActivityBudgetItems(activityId);
+    
+    // Show the modal
+    document.getElementById('budgetManagementModal').classList.add('show');
+}
+
+// Delete activity
+async function deleteActivity(activityId) {
+    if (!confirm('Are you sure you want to delete this activity? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete activity');
+        }
+        
+        alert('Activity deleted successfully');
+        loadActivities();
+    } catch (error) {
+        console.error('Error deleting activity:', error);
+        alert('Failed to delete activity. Please try again.');
+    }
+}
+
+// Helper function to load projects for activities dropdown
+async function loadProjectsForActivities() {
+    try {
+        const response = await fetch('https://man-m681.onrender.com/projects/');
+        if (!response.ok) throw new Error('Failed to fetch projects');
+        
+        const data = await response.json();
+        const projectSelect = document.getElementById('activityProject');
+        projectSelect.innerHTML = '';
+        
+        data.projects.forEach(project => {
+            const option = document.createElement('option');
+            option.value = project.id;
+            option.textContent = project.name;
+            projectSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading projects for activities:', error);
+        alert('Failed to load projects for activities dropdown');
+    }
+}
+
+// Helper function to close modal
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Function to create budget management modal
+function createBudgetManagementModal() {
+    const modalHTML = `
+        <div class="project-modal" id="budgetManagementModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Budget Items for <span id="budgetForActivityName"></span></h3>
+                    <button class="close-btn" onclick="closeModal('budgetManagementModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="modern-table" id="budgetItemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                    <th>Category</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="budgetItemsTableBody">
+                                <!-- Budget items will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section-header" style="margin-top: 20px;">
+                        <h4>Add New Budget Item</h4>
+                    </div>
+                    <form id="newBudgetItemForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newItemName">Item Name*</label>
+                                <input type="text" id="newItemName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newItemDescription">Description</label>
+                                <input type="text" id="newItemDescription">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newItemQuantity">Quantity*</label>
+                                <input type="number" id="newItemQuantity" value="1" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newItemUnitPrice">Unit Price (UGX)*</label>
+                                <input type="number" id="newItemUnitPrice" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newItemCategory">Category*</label>
+                                <select id="newItemCategory" required>
+                                    <option value="materials">Materials</option>
+                                    <option value="labor">Labor</option>
+                                    <option value="transport">Transport</option>
+                                    <option value="equipment">Equipment</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="file-manager-btn secondary" onclick="closeModal('budgetManagementModal')">
+                        Close
+                    </button>
+                    <button class="file-manager-btn" onclick="addBudgetItem()">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Function to load budget items for an activity
+async function loadActivityBudgetItems(activityId) {
+    try {
+        const tbody = document.getElementById('budgetItemsTableBody');
+        tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading budget items...</td></tr>';
+        
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
+        if (!response.ok) throw new Error('Failed to fetch budget items');
+        
+        const budgetItems = await response.json();
+        tbody.innerHTML = '';
+        
+        if (budgetItems.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No budget items found</td></tr>';
+            return;
+        }
+        
+        let totalBudget = 0;
+        
+        budgetItems.forEach(item => {
+            totalBudget += item.total;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.item_name}</td>
+                <td>${item.description || '-'}</td>
+                <td>${item.quantity}</td>
+                <td>UGX ${item.unit_price.toLocaleString()}</td>
+                <td>UGX ${item.total.toLocaleString()}</td>
+                <td>${item.category}</td>
+                <td>
+                    <button class="action-btn delete-btn" onclick="deleteBudgetItem(${item.id}, ${activityId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // Add total row
+        const totalRow = document.createElement('tr');
+        totalRow.className = 'total-row';
+        totalRow.innerHTML = `
+            <td colspan="4" style="text-align: right;"><strong>Total Budget:</strong></td>
+            <td><strong>UGX ${totalBudget.toLocaleString()}</strong></td>
+            <td colspan="2"></td>
+        `;
+        tbody.appendChild(totalRow);
+        
+    } catch (error) {
+        console.error('Error loading budget items:', error);
+        document.getElementById('budgetItemsTableBody').innerHTML = 
+            '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load budget items</td></tr>';
+    }
+}
+
+// Function to add a new budget item
+async function addBudgetItem() {
+    const activityId = document.getElementById('budgetManagementModal').dataset.activityId;
+    const itemData = {
+        item_name: document.getElementById('newItemName').value.trim(),
+        description: document.getElementById('newItemDescription').value.trim(),
+        quantity: parseFloat(document.getElementById('newItemQuantity').value),
+        unit_price: parseFloat(document.getElementById('newItemUnitPrice').value),
+        category: document.getElementById('newItemCategory').value
+    };
+    
+    // Validate required fields
+    if (!itemData.item_name || isNaN(itemData.quantity) || isNaN(itemData.unit_price)) {
+        alert('Please fill in all required fields with valid values');
+        return;
+    }
+    
+    try {
+        const submitBtn = document.querySelector('#budgetManagementModal .modal-footer .file-manager-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(itemData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to add budget item');
+        }
+        
+        // Refresh the budget items list
+        await loadActivityBudgetItems(activityId);
+        
+        // Clear the form
+        document.getElementById('newItemName').value = '';
+        document.getElementById('newItemDescription').value = '';
+        document.getElementById('newItemQuantity').value = '1';
+        document.getElementById('newItemUnitPrice').value = '';
+        
+    } catch (error) {
+        console.error('Error adding budget item:', error);
+        alert(`Failed to add budget item: ${error.message}`);
+    } finally {
+        const submitBtn = document.querySelector('#budgetManagementModal .modal-footer .file-manager-btn');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+// Function to delete a budget item
+async function deleteBudgetItem(itemId, activityId) {
+    if (!confirm('Are you sure you want to delete this budget item?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/budget-items/${itemId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete budget item');
+        }
+        
+        // Refresh the budget items list
+        await loadActivityBudgetItems(activityId);
+        
+    } catch (error) {
+        console.error('Error deleting budget item:', error);
+        alert('Failed to delete budget item');
+    }
+}
