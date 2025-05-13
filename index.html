@@ -3165,7 +3165,9 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                           
+                            <tbody id="donationsTableBody">
+                             <!-- Donations will be loaded here dynamically -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -3358,22 +3360,19 @@
                 <h3 class="section-title">Donation History</h3>
             </div>
             <div class="table-responsive">
-                <table class="donations-table">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Donor</th>
-            <th>Amount</th>
-            <th>Payment Method</th>
-            <th>Campaign/Project</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="donationsTableBody">
-        <!-- Donations will be loaded here dynamically -->
-    </tbody>
-</table>
+                <table class="donations-table" id="donorDonationsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Project</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Donation history will be loaded here -->
+                    </tbody>
+                </table>
             </div>
             
             <div class="donor-stats" style="margin-top: 20px;">
@@ -3587,10 +3586,10 @@
     <div class="director-dashboard-header">
         <h2 class="section-title">Director Dashboard</h2>
         <button class="file-manager-btn" id="manageProjectsBtn">
-            <i class="fas fa-project-diagram"></i> <a href="https://ubmis.com/projects.html">Manage Projects</a>
+            <i class="fas fa-project-diagram"></i> <a href="https://ubmis.com/projects">Manage Projects</a>
         </button>
         <button class="file-manager-btn" id="reportsBtn" style="margin-left: 10px;">
-            <i class="fas fa-file-alt"></i> <a href="https://ubmis.com/submit.html">Reports</a>
+            <i class="fas fa-file-alt"></i> <a href="https://ubmis.com/submit">Reports</a>
         </button>
     </div>
 
