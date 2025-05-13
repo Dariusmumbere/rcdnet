@@ -1148,20 +1148,9 @@ async function populateDonorDropdown() {
         if (!response.ok) throw new Error('Failed to fetch donors');
         
         const donors = await response.json();
-        const donorNameInput = document.getElementById('donorName');
-        
-        // Create datalist if it doesn't exist
-        if (!document.getElementById('donorNamesList')) {
-            const datalist = document.createElement('datalist');
-            datalist.id = 'donorNamesList';
-            donorNameInput.setAttribute('list', 'donorNamesList');
-            document.body.appendChild(datalist);
-        }
-        
         const datalist = document.getElementById('donorNamesList');
-        datalist.innerHTML = '';
+        datalist.innerHTML = ''; // Clear existing options
         
-        // Add each donor as an option
         donors.forEach(donor => {
             const option = document.createElement('option');
             option.value = donor.name;
@@ -1172,23 +1161,9 @@ async function populateDonorDropdown() {
         // You might want to show a user-friendly error message here
     }
 }
-function openAddDonationModal() {
-    // Reset form and set to "add" mode
-    document.getElementById('donationForm').reset();
-    document.querySelector('#addDonationModal .modal-header h3').textContent = 'Add New Donation';
-    document.querySelector('#addDonationModal .modal-footer .file-manager-btn').textContent = 'Save Donation';
-    document.getElementById('addDonationModal').dataset.donationId = '';
-    
-    // Populate donor dropdown
-    populateDonorDropdown();
-    
-    // Open modal
-    document.getElementById('addDonationModal').classList.add('show');
-}
 
 // Expose functions to global scope
 window.openDonorModal = openDonorModal;
-window.openAddDonationModal = openAddDonationModal;
 window.closeDonorModal = closeDonorModal;
 window.viewDonorHistory = viewDonorHistory;
 window.saveDonor = saveDonor;
