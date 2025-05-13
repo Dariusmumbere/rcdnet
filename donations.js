@@ -1203,6 +1203,27 @@ function updateProgramAreaCards(donations) {
     });
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're on the donations page
+    if (document.getElementById('donationsContent').style.display === 'block') {
+        loadDonations();
+    }
+    
+    // Also load when switching to donations tab
+    const donationsLink = document.getElementById('donationsLink');
+    if (donationsLink) {
+        donationsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Show donations content and hide others
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('fileManagerContent').style.display = 'none';
+            document.getElementById('donationsContent').style.display = 'block';
+            
+            // Load donations
+            loadDonations();
+        });
+    }
+});
 // Expose functions to global scope
 window.openDonorModal = openDonorModal;
 window.closeDonorModal = closeDonorModal;
