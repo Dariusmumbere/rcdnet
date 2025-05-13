@@ -1,5 +1,3 @@
-// donations.js - Handles all donation-related functionality
-
 // Global variables
 let currentDonorId = null;
 let currentDonationId = null;
