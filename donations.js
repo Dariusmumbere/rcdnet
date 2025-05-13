@@ -88,13 +88,7 @@ function setupTabSwitching() {
 // Donation CRUD operations
 async function loadDonations() {
     try {
-        // Make sure we're selecting the tbody element
         const donationsTable = document.querySelector('.donations-table tbody');
-        if (!donationsTable) {
-            console.error('Could not find donations table body');
-            return;
-        }
-        
         donationsTable.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading donations...</td></tr>';
         
         const response = await fetch('https://man-m681.onrender.com/donations/');
@@ -104,56 +98,36 @@ async function loadDonations() {
         }
         
         const data = await response.json();
-        donationsTable.innerHTML = ''; // Clear loading message
-        
-        if (data.length === 0) {
-            donationsTable.innerHTML = '<tr><td colspan="7" style="text-align: center;">No donations found</td></tr>';
-            return;
-        }
+        donationsTable.innerHTML = '';
         
         // Sort donations by date (newest first)
         data.sort((a, b) => new Date(b.date) - new Date(a.date));
         
-        data.forEach(donation => {
+        // Display only the most recent donations (e.g., last 10)
+        const recentDonations = data.slice(0, 10);
+        
+        recentDonations.forEach(donation => {
             const row = document.createElement('tr');
             row.setAttribute('data-donation-id', donation.id);
             row.innerHTML = `
-                <td>${formatDate(donation.date)}</td>
+                <td>${new Date(donation.date).toLocaleDateString()}</td>
                 <td>${donation.donor_name}</td>
                 <td>UGX ${donation.amount.toLocaleString()}</td>
                 <td>${formatPaymentMethod(donation.payment_method)}</td>
                 <td>${donation.project || 'General Fund'}</td>
                 <td><span class="status-badge completed">Completed</span></td>
                 <td>
-                    <button class="action-btn view-btn" onclick="viewDonation(${donation.id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="action-btn edit-btn" onclick="editDonation(${donation.id})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn delete-btn" onclick="deleteDonation(${donation.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <button class="action-btn view-btn" onclick="viewDonation(${donation.id})"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-btn" onclick="editDonation(${donation.id})"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-btn" onclick="deleteDonation(${donation.id})"><i class="fas fa-trash"></i></button>
                 </td>
             `;
             donationsTable.appendChild(row);
         });
-        
-        // Update cards after loading donations
-        updateDonationCards(data);
     } catch (error) {
         console.error('Error loading donations:', error);
-        const donationsTable = document.querySelector('.donations-table tbody');
-        if (donationsTable) {
-            donationsTable.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load donations</td></tr>';
-        }
+        donationsTable.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load donations</td></tr>';
     }
-}
-
-// Helper function to format dates
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
 async function viewDonation(donationId) {
@@ -1165,65 +1139,7 @@ async function loadDashboardSummary() {
         return null;
     }
 }
-function updateDonationCards(donations) {
-    // Update stats cards if they exist
-    const totalDonations = donations.reduce((sum, d) => sum + d.amount, 0);
-    const recentDonations = donations.slice(0, 5); // Get 5 most recent
-    
-    // Update the total donations card
-    const totalCard = document.querySelector('.stat-card .stat-value');
-    if (totalCard) {
-        totalCard.textContent = `UGX ${totalDonations.toLocaleString()}`;
-    }
-    
-    // Update program area cards
-    updateProgramAreaCards(donations);
-}
 
-function updateProgramAreaCards(donations) {
-    // Group donations by project
-    const projects = {};
-    donations.forEach(donation => {
-        const project = donation.project || 'General Fund';
-        if (!projects[project]) {
-            projects[project] = 0;
-        }
-        projects[project] += donation.amount;
-    });
-    
-    // Update each program card
-    document.querySelectorAll('.bank-card').forEach(card => {
-        const title = card.querySelector('.bank-card-title').textContent.trim();
-        if (projects[title]) {
-            const balanceElement = card.querySelector('.bank-card-balance');
-            if (balanceElement) {
-                balanceElement.textContent = `UGX ${projects[title].toLocaleString()}`;
-            }
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if we're on the donations page
-    if (document.getElementById('donationsContent').style.display === 'block') {
-        loadDonations();
-    }
-    
-    // Also load when switching to donations tab
-    const donationsLink = document.getElementById('donationsLink');
-    if (donationsLink) {
-        donationsLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            // Show donations content and hide others
-            document.getElementById('dashboardContent').style.display = 'none';
-            document.getElementById('fileManagerContent').style.display = 'none';
-            document.getElementById('donationsContent').style.display = 'block';
-            
-            // Load donations
-            loadDonations();
-        });
-    }
-});
 // Expose functions to global scope
 window.openDonorModal = openDonorModal;
 window.closeDonorModal = closeDonorModal;
