@@ -12,7 +12,11 @@ function setupDonationsPage() {
     setupTabSwitching();
     
     // Set up event listeners
-    document.getElementById('addDonationBtn').addEventListener('click', openAddDonationModal);
+    document.getElementById('addDonationBtn').addEventListener('click', function() {
+        document.getElementById('addDonationModal').classList.add('show');
+        populateDonorDropdown(); // This ensures fresh data each time
+    });
+    
     document.getElementById('addDonorBtn').addEventListener('click', openAddDonorModal);
     
     // Set up form submissions
@@ -1160,6 +1164,10 @@ async function populateDonorDropdown() {
         console.error('Error populating donor dropdown:', error);
         // You might want to show a user-friendly error message here
     }
+}
+function openAddDonationModal() {
+    document.getElementById('addDonationModal').classList.add('show');
+    populateDonorDropdown(); // Populate the dropdown when modal opens
 }
 
 // Expose functions to global scope
