@@ -4016,7 +4016,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    loadDashboardSummary();
+    loadProgramCards();
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const reportsMenu = document.getElementById('reportsMenu');
@@ -4100,7 +4100,7 @@
         dashboardContent.style.display = 'block';
         fileManagerContent.style.display = 'none';
         setActiveNavItem(dashboardLink);
-        loadDashboardSummary();
+        loadProgramCards();
     });
 
     fundraisingLink.addEventListener('click', function(e) {
@@ -6681,6 +6681,58 @@ async function deleteBudgetItem(itemId, activityId) {
     } catch (error) {
         console.error('Error deleting budget item:', error);
         alert('Failed to delete budget item');
+    }
+}
+sync function loadProgramCards() {
+    try {
+        // Fetch data from your dashboard-summary endpoint
+        const response = await fetch('https://man-m681.onrender.com/dashboard-summary/');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch dashboard data');
+        }
+        
+        const data = await response.json();
+        
+        // Debug: Log the received data to inspect its structure
+        console.log('Dashboard data:', data);
+        
+        // Update the main account card
+        const mainAccountElement = document.querySelector('.main-bank-card .bank-card-balance');
+        if (mainAccountElement && data.main_account_balance !== undefined) {
+            mainAccountElement.textContent = `UGX ${data.main_account_balance.toLocaleString()}`;
+        }
+        
+        // Update program area cards
+        const programCards = {
+            'Women Empowerment': document.querySelector('.program-card-1 .bank-card-balance'),
+            'Vocational Education': document.querySelector('.program-card-2 .bank-card-balance'),
+            'Climate Change': document.querySelector('.program-card-3 .bank-card-balance'),
+            'Reproductive Health': document.querySelector('.program-card-4 .bank-card-balance')
+        };
+        
+        // Check if program_balances exists in the response
+        if (data.program_balances) {
+            for (const [programName, cardElement] of Object.entries(programCards)) {
+                if (cardElement && data.program_balances[programName] !== undefined) {
+                    cardElement.textContent = `UGX ${data.program_balances[programName].toLocaleString()}`;
+                }
+            }
+        }
+        
+        // Update quick stats if available
+        if (data.total_donations !== undefined) {
+            const donationStatElement = document.querySelector('.stat-card .stat-value');
+            if (donationStatElement) {
+                donationStatElement.textContent = `UGX ${data.total_donations.toLocaleString()}`;
+            }
+        }
+        
+        console.log('Program cards updated successfully');
+        
+    } catch (error) {
+        console.error('Error loading program cards:', error);
+        // You might want to show a user-friendly error message here
     }
 }
     </script>
