@@ -4563,20 +4563,16 @@ function closeDonorModal() {
 // Function to load donor data
 async function loadDonorData(donorId) {
     try {
-        // Fetch donor details and stats in parallel
-        const [donorResponse, statsResponse] = await Promise.all([
-            fetch(`https://man-m681.onrender.com/donors/${donorId}`),
-            fetch(`https://man-m681.onrender.com/donors/${donorId}/donations`)
-        ]);
+        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
         
-        if (!donorResponse.ok || !statsResponse.ok) {
-            throw new Error('Failed to fetch donor data');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to fetch donor data');
         }
         
-        const donor = await donorResponse.json();
-        const stats = await statsResponse.json();
+        const donor = await response.json();
         
-        // Populate form with donor details
+        // Populate form
         document.getElementById('donorId').value = donor.id;
         document.getElementById('donorProfileName').value = donor.name;
         document.getElementById('donorEmail').value = donor.email || '';
@@ -4586,44 +4582,14 @@ async function loadDonorData(donorId) {
         document.getElementById('donorCategory').value = donor.category || 'one-time';
         document.getElementById('donorNotes').value = donor.notes || '';
         
-        // Populate stats section
-        document.getElementById('totalDonations').textContent = `UGX ${stats.total_donations.toLocaleString()}`;
-        document.getElementById('donationCount').textContent = stats.donation_count;
-        
-        if (stats.donations.length > 0) {
-            const dates = stats.donations.map(d => new Date(d.date));
-            dates.sort((a, b) => a - b);
-            document.getElementById('firstDonation').textContent = dates[0].toLocaleDateString();
-            document.getElementById('lastDonation').textContent = dates[dates.length - 1].toLocaleDateString();
-        } else {
-            document.getElementById('firstDonation').textContent = '-';
-            document.getElementById('lastDonation').textContent = '-';
-        }
-        
-        // Load donation history table
-        const tbody = document.getElementById('donorDonationsTable').querySelector('tbody');
-        tbody.innerHTML = '';
-        
-        if (stats.donations.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No donation history available</td></tr>';
-        } else {
-            stats.donations.forEach(donation => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${new Date(donation.date).toLocaleDateString()}</td>
-                    <td>UGX ${donation.amount.toLocaleString()}</td>
-                    <td>${donation.project || 'General Fund'}</td>
-                    <td><span class="status-badge completed">Completed</span></td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-        
+        // Load donation history
+        loadDonorDonations(donorId);
     } catch (error) {
         console.error('Error loading donor data:', error);
         alert(`Failed to load donor data: ${error.message}`);
     }
 }
+
 // Function to load donor's donations
 async function loadDonorDonations(donorId) {
     try {
@@ -4793,20 +4759,13 @@ async function loadDonorProfiles(search = '') {
         const container = document.querySelector('.donor-cards');
         container.innerHTML = '<div class="loading">Loading donors...</div>';
         
-        // Fetch donors and their stats in parallel
-        const [donorsResponse, statsResponse] = await Promise.all([
-            fetch(`https://man-m681.onrender.com/donors/?search=${encodeURIComponent(search)}`),
-            fetch('https://man-m681.onrender.com/donors/stats/')
-        ]);
+        const response = await fetch(`https://man-m681.onrender.com/donors/?search=${encodeURIComponent(search)}`);
         
-        if (!donorsResponse.ok || !statsResponse.ok) {
-            throw new Error('Failed to fetch donor data');
+        if (!response.ok) {
+            throw new Error('Failed to fetch donors');
         }
         
-        const donors = await donorsResponse.json();
-        const statsData = await statsResponse.json();
-        const stats = statsData.donor_stats;
-        
+        const donors = await response.json();
         container.innerHTML = '';
         
         if (donors.length === 0) {
@@ -4814,16 +4773,7 @@ async function loadDonorProfiles(search = '') {
             return;
         }
         
-        // Create donor cards with stats
         donors.forEach(donor => {
-            const donorStats = stats[donor.id] || {
-                name: donor.name,
-                donation_count: 0,
-                total_donated: 0,
-                first_donation: null,
-                last_donation: null
-            };
-            
             const donorCard = document.createElement('div');
             donorCard.className = 'donor-card';
             donorCard.innerHTML = `
@@ -4839,19 +4789,19 @@ async function loadDonorProfiles(search = '') {
                     <div class="donor-stats">
                         <div class="stat-item">
                             <span class="stat-label">Total Donations:</span>
-                            <span class="stat-value">UGX ${donorStats.total_donated.toLocaleString()}</span>
+                            <span class="stat-value">UGX ${donor.stats.total_donated.toLocaleString()}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Donation Count:</span>
-                            <span class="stat-value">${donorStats.donation_count}</span>
+                            <span class="stat-value">${donor.stats.donation_count}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">First Donation:</span>
-                            <span class="stat-value">${donorStats.first_donation || '-'}</span>
+                            <span class="stat-value">${donor.stats.first_donation ? new Date(donor.stats.first_donation).toLocaleDateString() : '-'}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Last Donation:</span>
-                            <span class="stat-value">${donorStats.last_donation || '-'}</span>
+                            <span class="stat-value">${donor.stats.last_donation ? new Date(donor.stats.last_donation).toLocaleDateString() : '-'}</span>
                         </div>
                     </div>
                 </div>
@@ -4876,29 +4826,40 @@ async function loadDonorProfiles(search = '') {
     }
 }
         
-async function loadDonorStats() {
+async function loadDonorData(donorId) {
     try {
-        const response = await fetch('https://man-m681.onrender.com/donors/stats/');
-        if (!response.ok) throw new Error('Failed to fetch donor stats');
+        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
         
-        const data = await response.json();
-        const stats = data.donor_stats;
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to fetch donor data');
+        }
         
-        // Update each donor card with stats
-        document.querySelectorAll('.donor-card').forEach(card => {
-            const donorName = card.querySelector('.donor-name').textContent;
-            const statValueElements = card.querySelectorAll('.stat-value');
-            
-            // Find this donor in the stats
-            const donorId = Object.keys(stats).find(id => stats[id].name === donorName);
-            if (donorId) {
-                const donorStat = stats[donorId];
-                statValueElements[0].textContent = `UGX ${donorStat.total_donated.toLocaleString()}`;
-                statValueElements[1].textContent = donorStat.last_donation || '-';
-            }
-        });
+        const donor = await response.json();
+        
+        // Populate form
+        document.getElementById('donorId').value = donor.id;
+        document.getElementById('donorProfileName').value = donor.name;
+        document.getElementById('donorEmail').value = donor.email || '';
+        document.getElementById('donorPhone').value = donor.phone || '';
+        document.getElementById('donorAddress').value = donor.address || '';
+        document.getElementById('donorType').value = donor.donor_type || 'individual';
+        document.getElementById('donorCategory').value = donor.category || 'one-time';
+        document.getElementById('donorNotes').value = donor.notes || '';
+        
+        // Update stats in the modal
+        document.getElementById('totalDonations').textContent = `UGX ${donor.stats.total_donated.toLocaleString()}`;
+        document.getElementById('donationCount').textContent = donor.stats.donation_count;
+        document.getElementById('firstDonation').textContent = donor.stats.first_donation ? 
+            new Date(donor.stats.first_donation).toLocaleDateString() : '-';
+        document.getElementById('lastDonation').textContent = donor.stats.last_donation ? 
+            new Date(donor.stats.last_donation).toLocaleDateString() : '-';
+        
+        // Load donation history
+        loadDonorDonations(donorId);
     } catch (error) {
-        console.error('Error loading donor stats:', error);
+        console.error('Error loading donor data:', error);
+        alert(`Failed to load donor data: ${error.message}`);
     }
 }
         
