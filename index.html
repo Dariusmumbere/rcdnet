@@ -4563,16 +4563,20 @@ function closeDonorModal() {
 // Function to load donor data
 async function loadDonorData(donorId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
+        // Fetch donor details and stats in parallel
+        const [donorResponse, statsResponse] = await Promise.all([
+            fetch(`https://man-m681.onrender.com/donors/${donorId}`),
+            fetch(`https://man-m681.onrender.com/donors/${donorId}/donations`)
+        ]);
         
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Failed to fetch donor data');
+        if (!donorResponse.ok || !statsResponse.ok) {
+            throw new Error('Failed to fetch donor data');
         }
         
-        const donor = await response.json();
+        const donor = await donorResponse.json();
+        const stats = await statsResponse.json();
         
-        // Populate form
+        // Populate form with donor details
         document.getElementById('donorId').value = donor.id;
         document.getElementById('donorProfileName').value = donor.name;
         document.getElementById('donorEmail').value = donor.email || '';
@@ -4582,14 +4586,44 @@ async function loadDonorData(donorId) {
         document.getElementById('donorCategory').value = donor.category || 'one-time';
         document.getElementById('donorNotes').value = donor.notes || '';
         
-        // Load donation history
-        loadDonorDonations(donorId);
+        // Populate stats section
+        document.getElementById('totalDonations').textContent = `UGX ${stats.total_donations.toLocaleString()}`;
+        document.getElementById('donationCount').textContent = stats.donation_count;
+        
+        if (stats.donations.length > 0) {
+            const dates = stats.donations.map(d => new Date(d.date));
+            dates.sort((a, b) => a - b);
+            document.getElementById('firstDonation').textContent = dates[0].toLocaleDateString();
+            document.getElementById('lastDonation').textContent = dates[dates.length - 1].toLocaleDateString();
+        } else {
+            document.getElementById('firstDonation').textContent = '-';
+            document.getElementById('lastDonation').textContent = '-';
+        }
+        
+        // Load donation history table
+        const tbody = document.getElementById('donorDonationsTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        
+        if (stats.donations.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No donation history available</td></tr>';
+        } else {
+            stats.donations.forEach(donation => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(donation.date).toLocaleDateString()}</td>
+                    <td>UGX ${donation.amount.toLocaleString()}</td>
+                    <td>${donation.project || 'General Fund'}</td>
+                    <td><span class="status-badge completed">Completed</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
     } catch (error) {
         console.error('Error loading donor data:', error);
         alert(`Failed to load donor data: ${error.message}`);
     }
 }
-
 // Function to load donor's donations
 async function loadDonorDonations(donorId) {
     try {
@@ -4780,7 +4814,7 @@ async function loadDonorProfiles(search = '') {
             return;
         }
         
-        // Create donor cards
+        // Create donor cards with stats
         donors.forEach(donor => {
             const donorStats = stats[donor.id] || {
                 name: donor.name,
@@ -4841,7 +4875,7 @@ async function loadDonorProfiles(search = '') {
             `<p class="error">Failed to load donors: ${error.message}</p>`;
     }
 }
-
+        
 async function loadDonorStats() {
     try {
         const response = await fetch('https://man-m681.onrender.com/donors/stats/');
