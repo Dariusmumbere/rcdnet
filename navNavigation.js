@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set initial active state (dashboard)
     setActiveNavItem(document.querySelector('#dashboardLink'));
     contentSections.dashboard.style.display = 'block';
+    loadDashboardSummary();
     
     // Handle navigation clicks
     sidebarMenu.addEventListener('click', function(e) {
