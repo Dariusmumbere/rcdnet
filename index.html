@@ -6688,21 +6688,6 @@ sync function loadProgramCards() {
         // You might want to show a user-friendly error message here
     }
 }
-fetch('https://man-m681.onrender.com/program-areas/reset-balances', {
-  method: 'PUT',
-  headers: {
-    'Content-Type': 'application/json',
-    // Add any auth headers if required, like:
-    // 'Authorization': 'Bearer YOUR_TOKEN'
-  },
-  // If the API requires a body, include it here
-  // body: JSON.stringify({ key: 'value' })
-})
-  .then(response => response.json())
-  .then(data => console.log('Success:', data))
-  .catch(error => console.error('Error:', error));
-
-
     </script>
     <script src="sidebarToggle.js"></script>
     <script src="navNavigation.js"></script>
