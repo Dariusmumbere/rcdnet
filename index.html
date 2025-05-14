@@ -12,6 +12,7 @@
     <script src="donations-management.js"></script>
     <script src="folders.js"></script>
     <script src="activities.js"></script>
+    <script src="activity-budget-approval.js"></script>
     
     <style>
         :root {
@@ -6687,144 +6688,7 @@ sync function loadProgramCards() {
     }
 }
 
-async function submitActivityBudget(activityId) {
-    if (!confirm('Are you sure you want to submit this activity budget for approval?')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/submit-budget/`, {
-            method: 'POST'
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Failed to submit budget');
-        }
-        
-        const data = await response.json();
-        alert(`Budget submitted for approval: ${data.message}`);
-        
-        // Refresh activities table
-        loadActivities();
-    } catch (error) {
-        console.error('Error submitting activity budget:', error);
-        alert(`Failed to submit budget: ${error.message}`);
-    }
-}
-// Load pending approvals for director
-async function loadPendingApprovals() {
-    try {
-        const tbody = document.getElementById('pendingApprovalsTable');
-        tbody.innerHTML = '<tr><td colspan="5" class="loading">Loading pending approvals...</td></tr>';
-        
-        const response = await fetch('https://man-m681.onrender.com/activities/pending-budgets/');
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch pending approvals');
-        }
-        
-        const approvals = await response.json();
-        tbody.innerHTML = '';
-        
-        if (approvals.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No pending approvals</td></tr>';
-            return;
-        }
-        
-        approvals.forEach(approval => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${approval.activity_name}</td>
-                <td>${approval.project_name}</td>
-                <td>UGX ${approval.budget_amount.toLocaleString()}</td>
-                <td>${new Date(approval.created_at).toLocaleDateString()}</td>
-                <td>
-                    <button class="action-btn approve-btn" onclick="reviewBudgetApproval(${approval.activity_id}, true)">
-                        <i class="fas fa-check"></i> Approve
-                    </button>
-                    <button class="action-btn reject-btn" onclick="reviewBudgetApproval(${approval.activity_id}, false)">
-                        <i class="fas fa-times"></i> Reject
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Error loading pending approvals:', error);
-        document.getElementById('pendingApprovalsTable').innerHTML = 
-            '<tr><td colspan="5" style="text-align: center; color: red;">Failed to load approvals</td></tr>';
-    }
-}
 
-// Review and approve/reject budget
-async function reviewBudgetApproval(activityId, approve) {
-    const remarks = prompt(`Enter remarks for ${approve ? 'approval' : 'rejection'}:`, '');
-    if (remarks === null) return; // User cancelled
-    
-    try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/approve-budget/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                approved: approve,
-                remarks: remarks
-            })
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Failed to process approval');
-        }
-        
-        const data = await response.json();
-        alert(`Budget ${approve ? 'approved' : 'rejected'} successfully!`);
-        
-        // Refresh approvals list
-        loadPendingApprovals();
-        
-        // Update program cards to reflect new balances
-        loadProgramCards();
-    } catch (error) {
-        console.error('Error processing approval:', error);
-        alert(`Failed to process approval: ${error.message}`);
-    }
-}
-
-// Add event listener for refresh button
-document.getElementById('refreshApprovalsBtn').addEventListener('click', loadPendingApprovals);
-
-// Check budget approval status
-async function checkBudgetStatus(activityId) {
-    try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-status/`);
-        
-        if (!response.ok) {
-            throw new Error('Failed to check budget status');
-        }
-        
-        const status = await response.json();
-        
-        let message = `Budget Status: ${status.status.toUpperCase()}\n`;
-        message += `Amount: UGX ${status.budget_amount.toLocaleString()}\n`;
-        message += `Submitted: ${new Date(status.created_at).toLocaleDateString()}\n`;
-        
-        if (status.approved_at) {
-            message += `Approved: ${new Date(status.approved_at).toLocaleDateString()}\n`;
-        }
-        
-        if (status.remarks) {
-            message += `Remarks: ${status.remarks}\n`;
-        }
-        
-        alert(message);
-    } catch (error) {
-        console.error('Error checking budget status:', error);
-        alert('Failed to check budget status');
-    }
-}
     </script>
     <script src="sidebarToggle.js"></script>
     <script src="navNavigation.js"></script>
