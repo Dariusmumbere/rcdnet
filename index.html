@@ -4100,6 +4100,7 @@
         dashboardContent.style.display = 'block';
         fileManagerContent.style.display = 'none';
         setActiveNavItem(dashboardLink);
+        loadDashboardSummary();
     });
 
     fundraisingLink.addEventListener('click', function(e) {
@@ -6424,7 +6425,7 @@ async function loadDashboardSummary() {
         // Update main account card
         const mainAccountElement = document.querySelector('.main-bank-card .bank-card-balance');
         if (mainAccountElement) {
-            mainAccountElement.textContent = `UGX ${data.main_account_balance?.toLocaleString() || '0'}`;
+            mainAccountElement.textContent = `UGX ${(data.main_account_balance || 0).toLocaleString()}`;
         }
         
         // Update program area cards
@@ -6445,7 +6446,7 @@ async function loadDashboardSummary() {
         // Update total donations stat card
         const donationStatElement = document.querySelector('.stat-card .stat-value');
         if (donationStatElement) {
-            donationStatElement.textContent = `UGX ${data.total_donations?.toLocaleString() || '0'}`;
+            donationStatElement.textContent = `UGX ${(data.total_donations || 0).toLocaleString()}`;
         }
         
     } catch (error) {
@@ -6453,6 +6454,7 @@ async function loadDashboardSummary() {
         // Don't show alert to avoid interrupting user experience
     }
 }
+        
 async function manageActivityBudget(activityId, activityName) {
     // Create or show the budget management modal
     if (!document.getElementById('budgetManagementModal')) {
