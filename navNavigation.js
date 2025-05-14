@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
         dashboard: document.getElementById('dashboardContent'),
         fundraising: document.getElementById('fileManagerContent'),
         donations: document.getElementById('donationsContent'),
-        implementProject: document.getElementById('implementProjectContent')
+        implementProject: document.getElementById('implementProjectContent'),
+        directorDashboard: document.getElementById('directorDashboard')
     };
     
     // Check if elements exist
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set initial active state (dashboard)
     setActiveNavItem(document.querySelector('#dashboardLink'));
     contentSections.dashboard.style.display = 'block';
+    loadProgramCards();
     
     // Handle navigation clicks
     sidebarMenu.addEventListener('click', function(e) {
@@ -38,6 +40,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show the target section
             if (contentSections[targetSection]) {
                 contentSections[targetSection].style.display = 'block';
+                
+                // Special handling for dashboard to load program cards
+                if (targetSection === 'dashboard') {
+                    loadProgramCards();
+                }
             }
             
             // Update active state
@@ -83,6 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show the target section
             contentSections[hash].style.display = 'block';
             
+            // Special handling for dashboard to load program cards
+            if (hash === 'dashboard') {
+                loadProgramCards();
+            }
+            
             // Update active state
             const correspondingNavItem = document.querySelector(`[href="#${hash}"]`);
             if (correspondingNavItem) {
@@ -91,3 +103,61 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Function to load program cards data
+async function loadProgramCards() {
+    try {
+        console.log('Loading program cards...');
+        
+        // Fetch data from your dashboard-summary endpoint
+        const response = await fetch('https://man-m681.onrender.com/dashboard-summary/');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch dashboard data');
+        }
+        
+        const data = await response.json();
+        console.log('Dashboard data:', data);
+        
+        // Update the main account card
+        const mainAccountElement = document.querySelector('.main-bank-card .bank-card-balance');
+        if (mainAccountElement && data.main_account_balance !== undefined) {
+            mainAccountElement.textContent = `UGX ${data.main_account_balance.toLocaleString()}`;
+        }
+        
+        // Update program area cards
+        const programCards = {
+            'Women Empowerment': document.querySelector('.program-card-1 .bank-card-balance'),
+            'Vocational Education': document.querySelector('.program-card-2 .bank-card-balance'),
+            'Climate Change': document.querySelector('.program-card-3 .bank-card-balance'),
+            'Reproductive Health': document.querySelector('.program-card-4 .bank-card-balance')
+        };
+        
+        // Check if program_balances exists in the response
+        if (data.program_balances) {
+            for (const [programName, cardElement] of Object.entries(programCards)) {
+                if (cardElement && data.program_balances[programName] !== undefined) {
+                    cardElement.textContent = `UGX ${data.program_balances[programName].toLocaleString()}`;
+                }
+            }
+        }
+        
+        // Update quick stats if available
+        if (data.total_donations !== undefined) {
+            const donationStatElement = document.querySelector('.stat-card .stat-value');
+            if (donationStatElement) {
+                donationStatElement.textContent = `UGX ${data.total_donations.toLocaleString()}`;
+            }
+        }
+        
+        console.log('Program cards updated successfully');
+        
+    } catch (error) {
+        console.error('Error loading program cards:', error);
+        // Show error to user if needed
+        const errorElement = document.createElement('div');
+        errorElement.className = 'error-message';
+        errorElement.textContent = 'Failed to load dashboard data. Please try again later.';
+        document.querySelector('.dashboard-content').prepend(errorElement);
+    }
+}
