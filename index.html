@@ -2881,6 +2881,13 @@
 .action-btn.submit-btn {
     color: var(--primary-color);
 }
+.action-btn.submit-btn {
+    color: var(--primary-color);
+}
+
+.action-btn.submit-btn:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
     </style>
 </head>
 <body>
@@ -5648,6 +5655,7 @@ async function loadActivities() {
                 'not_submitted': 'Draft'
             }[budgetStatus.status] || 'Draft';
             
+            // Add Submit button only if status is draft/not_submitted
             const submitButton = budgetStatus.status === 'not_submitted' ? 
                 `<button class="action-btn submit-btn" onclick="submitActivityBudget(${activity.id})">
                     <i class="fas fa-paper-plane"></i> Submit
@@ -6604,6 +6612,34 @@ async function rejectBudget(approvalId) {
         loadDirectorDashboard();
     } catch (error) {
         console.error('Error rejecting budget:', error);
+    }
+}
+async function submitActivityBudget(activityId) {
+    if (!confirm('Are you sure you want to submit this budget for approval?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/submit-budget/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to submit budget');
+        }
+        
+        const data = await response.json();
+        alert('Budget submitted for approval successfully!');
+        
+        // Refresh the activities table
+        loadActivities();
+    } catch (error) {
+        console.error('Error submitting budget:', error);
+        alert(`Failed to submit budget: ${error.message}`);
     }
 }
     </script>
