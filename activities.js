@@ -607,3 +607,114 @@ async function deleteBudgetItem(itemId, activityId) {
         alert('Failed to delete budget item');
     }
 }
+function openBudgetApprovalModal(activityId, activityName) {
+    document.getElementById('approvalActivityName').textContent = activityName;
+    document.getElementById('approvalActivityId').value = activityId;
+    document.getElementById('approvalRemarks').value = '';
+    document.getElementById('approvalModal').classList.add('show');
+}
+
+// Function to submit budget approval
+async function submitBudgetApproval(approved) {
+    const activityId = document.getElementById('approvalActivityId').value;
+    const remarks = document.getElementById('approvalRemarks').value;
+    
+    try {
+        const response = await fetch('https://man-m681.onrender.com/budget-approvals/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                activity_id: parseInt(activityId),
+                approved: approved,
+                remarks: remarks
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to submit approval');
+        }
+        
+        const data = await response.json();
+        alert(data.message);
+        
+        // Close modal and refresh activities
+        closeModal('approvalModal');
+        loadActivities();
+        
+        // Refresh program cards to show updated balances
+        loadProgramCards();
+        
+    } catch (error) {
+        console.error('Error submitting approval:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
+// Function to check if user is director
+function isDirector() {
+    // In a real app, you would check the user's role from their profile
+    const userRole = document.querySelector('.user-role').textContent;
+    return userRole.toLowerCase().includes('director');
+}
+
+// Function to show appropriate buttons based on user role
+function updateActivityActions() {
+    document.querySelectorAll('.activities-table tr').forEach(row => {
+        const statusCell = row.querySelector('.status-badge');
+        if (!statusCell) return;
+        
+        const status = statusCell.textContent.toLowerCase();
+        const actionCell = row.querySelector('td:last-child');
+        
+        if (status === 'pending approval' && isDirector()) {
+            // Show approve/reject buttons for director
+            actionCell.innerHTML = `
+                <button class="action-btn approve-btn" onclick="openBudgetApprovalModal(${row.dataset.activityId}, '${row.cells[0].textContent}')">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="action-btn reject-btn" onclick="submitBudgetApproval(false)">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            `;
+        } else if (status === 'planned') {
+            // Show submit for approval button for program officers
+            actionCell.innerHTML += `
+                <button class="action-btn submit-btn" onclick="submitForApproval(${row.dataset.activityId})">
+                    <i class="fas fa-paper-plane"></i> Submit
+                </button>
+            `;
+        }
+    });
+}
+
+// Function to submit activity for approval
+async function submitForApproval(activityId) {
+    if (!confirm('Submit this activity budget for director approval?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'pending approval'
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to submit for approval');
+        }
+        
+        alert('Activity submitted for approval successfully');
+        loadActivities();
+    } catch (error) {
+        console.error('Error submitting for approval:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
