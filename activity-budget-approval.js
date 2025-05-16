@@ -1,249 +1,63 @@
-// budget-approval.js
+// activity-budget-approval.js
 
 // Global variables
 let currentActivityId = null;
+let currentApprovalStatus = null;
 
-// Initialize the budget approval system
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up event listeners for budget-related actions
-    setupBudgetEventListeners();
+// Initialize the budget approval functionality
+function initBudgetApproval() {
+    // Load activities with their budget status
+    loadActivities();
     
-    // Load initial data if on the activities page
-    if (document.getElementById('activitiesTableBody')) {
-        loadActivities();
-    }
-});
-
-function setupBudgetEventListeners() {
-    // Handle budget submission
+    // Set up event listeners for buttons in the activities table
     document.addEventListener('click', function(e) {
+        // Handle submit button clicks
         if (e.target.closest('.action-btn.submit-btn')) {
             const activityId = e.target.closest('tr').dataset.activityId;
-            if (activityId) {
-                submitActivityBudget(parseInt(activityId));
-            }
+            submitActivityBudget(activityId);
         }
         
-        // Handle budget approval
-        if (e.target.closest('.action-btn.approve-btn')) {
-            const approvalId = e.target.closest('tr').dataset.approvalId;
-            if (approvalId) {
-                approveBudget(parseInt(approvalId));
-            }
-        }
-        
-        // Handle budget rejection
-        if (e.target.closest('.action-btn.reject-btn')) {
-            const approvalId = e.target.closest('tr').dataset.approvalId;
-            if (approvalId) {
-                rejectBudget(parseInt(approvalId));
-            }
+        // Handle budget management button clicks
+        if (e.target.closest('.action-btn.budget-btn')) {
+            const activityId = e.target.closest('tr').dataset.activityId;
+            const activityName = e.target.closest('tr').querySelector('td:first-child').textContent;
+            manageActivityBudget(activityId, activityName);
         }
     });
 }
 
-// Function to submit a budget for approval
-async function submitActivityBudget(activityId) {
-    try {
-        const response = await fetch(`/activities/${activityId}/submit-budget/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || 'Failed to submit budget');
-        }
-
-        const data = await response.json();
-        showToast('Budget submitted for approval successfully!');
-        
-        // Refresh the activities table to update the status
-        if (document.getElementById('activitiesTableBody')) {
-            loadActivities();
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('Error submitting budget:', error);
-        showToast(`Failed to submit budget: ${error.message}`, 'error');
-        throw error;
-    }
-}
-
-// Function to approve a budget
-async function approveBudget(approvalId, remarks = '') {
-    try {
-        const response = await fetch(`/budget-approvals/${approvalId}/approve/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                approved: true,
-                remarks: remarks
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || 'Failed to approve budget');
-        }
-
-        const data = await response.json();
-        showToast('Budget approved successfully!');
-        
-        // Refresh the approvals list
-        if (document.getElementById('pendingApprovalsTableBody')) {
-            loadPendingApprovals();
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('Error approving budget:', error);
-        showToast(`Failed to approve budget: ${error.message}`, 'error');
-        throw error;
-    }
-}
-
-// Function to reject a budget
-async function rejectBudget(approvalId, remarks = '') {
-    if (!remarks) {
-        remarks = prompt('Please enter the reason for rejection:');
-        if (!remarks) {
-            showToast('Rejection reason is required', 'error');
-            return;
-        }
-    }
-
-    try {
-        const response = await fetch(`/budget-approvals/${approvalId}/approve/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                approved: false,
-                remarks: remarks
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || 'Failed to reject budget');
-        }
-
-        const data = await response.json();
-        showToast('Budget rejected successfully!');
-        
-        // Refresh the approvals list
-        if (document.getElementById('pendingApprovalsTableBody')) {
-            loadPendingApprovals();
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('Error rejecting budget:', error);
-        showToast(`Failed to reject budget: ${error.message}`, 'error');
-        throw error;
-    }
-}
-
-// Function to load pending approvals (for directors)
-async function loadPendingApprovals() {
-    try {
-        const response = await fetch('/budget-approvals/pending/');
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch pending approvals');
-        }
-        
-        const approvals = await response.json();
-        const tableBody = document.getElementById('pendingApprovalsTableBody');
-        
-        if (!tableBody) return;
-        
-        tableBody.innerHTML = '';
-        
-        if (approvals.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5">No pending budget approvals</td></tr>';
-            return;
-        }
-        
-        approvals.forEach(approval => {
-            const row = document.createElement('tr');
-            row.dataset.approvalId = approval.id;
-            row.innerHTML = `
-                <td>${approval.activity_name}</td>
-                <td>${approval.project_name}</td>
-                <td>UGX ${approval.budget_amount.toLocaleString()}</td>
-                <td>${new Date(approval.submitted_at).toLocaleDateString()}</td>
-                <td>
-                    <button class="action-btn approve-btn">
-                        <i class="fas fa-check"></i> Approve
-                    </button>
-                    <button class="action-btn reject-btn">
-                        <i class="fas fa-times"></i> Reject
-                    </button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Error loading pending approvals:', error);
-        if (document.getElementById('pendingApprovalsTableBody')) {
-            document.getElementById('pendingApprovalsTableBody').innerHTML = 
-                '<tr><td colspan="5" style="color: red;">Failed to load pending approvals</td></tr>';
-        }
-    }
-}
-
-// Function to load activities with budget status
+// Load activities with their budget status
 async function loadActivities() {
     try {
-        const response = await fetch('/activities/');
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch activities');
-        }
-        
+        const response = await fetch('https://man-m681.onrender.com/activities/');
         const activities = await response.json();
+        
         const tableBody = document.getElementById('activitiesTableBody');
-        
-        if (!tableBody) return;
-        
         tableBody.innerHTML = '';
         
-        activities.forEach(activity => {
+        for (const activity of activities) {
+            // Get budget status for each activity
+            const statusResponse = await fetch(`https://man-m681.onrender.com/activities/${activity.id}/budget-status/`);
+            const budgetStatus = await statusResponse.json();
+            
+            // Determine status badge class and text
+            const statusBadge = {
+                'approved': 'status-badge approved',
+                'rejected': 'status-badge rejected',
+                'pending': 'status-badge pending',
+                'not_submitted': 'status-badge draft'
+            }[budgetStatus.status] || 'status-badge draft';
+            
+            const statusText = {
+                'approved': 'Approved',
+                'rejected': 'Rejected',
+                'pending': 'Pending Approval',
+                'not_submitted': 'Draft'
+            }[budgetStatus.status] || 'Draft';
+            
+            // Create table row
             const row = document.createElement('tr');
             row.dataset.activityId = activity.id;
-            
-            // Determine status badge and text
-            let statusBadge = '';
-            let statusText = '';
-            let submitButton = '';
-            
-            if (activity.budget_status === 'approved') {
-                statusBadge = 'status-badge approved';
-                statusText = 'Approved';
-            } else if (activity.budget_status === 'rejected') {
-                statusBadge = 'status-badge rejected';
-                statusText = 'Rejected';
-            } else if (activity.budget_status === 'pending') {
-                statusBadge = 'status-badge pending';
-                statusText = 'Pending Approval';
-            } else {
-                statusBadge = 'status-badge draft';
-                statusText = 'Draft';
-                submitButton = `
-                    <button class="action-btn submit-btn">
-                        <i class="fas fa-paper-plane"></i> Submit
-                    </button>
-                `;
-            }
-            
             row.innerHTML = `
                 <td>${activity.name}</td>
                 <td>${activity.project_name}</td>
@@ -252,60 +66,89 @@ async function loadActivities() {
                 <td>UGX ${activity.budget.toLocaleString()}</td>
                 <td><span class="${statusBadge}">${statusText}</span></td>
                 <td>
-                    ${submitButton}
+                    <button class="action-btn submit-btn" onclick="submitActivityBudget(${activity.id})">
+                        <i class="fas fa-paper-plane"></i> Submit
+                    </button>
                     <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
                         <i class="fas fa-coins"></i> Budget
                     </button>
                 </td>
             `;
             tableBody.appendChild(row);
-        });
+        }
     } catch (error) {
         console.error('Error loading activities:', error);
-        if (document.getElementById('activitiesTableBody')) {
-            document.getElementById('activitiesTableBody').innerHTML = 
-                '<tr><td colspan="7" style="color: red;">Failed to load activities</td></tr>';
+        document.getElementById('activitiesTableBody').innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: red;">
+                    Failed to load activities: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Submit activity budget for approval
+async function submitActivityBudget(activityId) {
+    if (!confirm('Are you sure you want to submit this budget for approval?')) {
+        return;
+    }
+    
+    try {
+        // Show loading state
+        const submitBtn = document.querySelector(`tr[data-activity-id="${activityId}"] .submit-btn`);
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/submit-budget/`, {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to submit budget');
+        }
+        
+        const data = await response.json();
+        showToast('Budget submitted for approval successfully!');
+        
+        // Update the status in the table
+        const statusCell = document.querySelector(`tr[data-activity-id="${activityId}"] .status-badge`);
+        if (statusCell) {
+            statusCell.className = 'status-badge pending';
+            statusCell.textContent = 'Pending Approval';
+        }
+        
+    } catch (error) {
+        console.error('Error submitting budget:', error);
+        showToast(`Failed to submit budget: ${error.message}`, 'error');
+    } finally {
+        // Restore button state
+        const submitBtn = document.querySelector(`tr[data-activity-id="${activityId}"] .submit-btn`);
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+            submitBtn.disabled = false;
         }
     }
 }
 
-// Helper function to show toast messages
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast-message ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 3000);
-}
-
-// Function to manage activity budget (opens budget management modal)
+// Manage activity budget (opens budget management modal)
 function manageActivityBudget(activityId, activityName) {
     currentActivityId = activityId;
     
-    // Set the activity name in the modal
+    // Show modal with activity name
     document.getElementById('budgetForActivityName').textContent = activityName;
+    document.getElementById('createBudgetModal').classList.add('show');
     
     // Load budget items for this activity
     loadBudgetItems(activityId);
-    
-    // Show the modal
-    document.getElementById('createBudgetModal').classList.add('show');
 }
 
-// Function to load budget items for an activity
+// Load budget items for an activity
 async function loadBudgetItems(activityId) {
     try {
-        const response = await fetch(`/activities/${activityId}/budget-items/`);
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
         
         if (!response.ok) {
             throw new Error('Failed to fetch budget items');
@@ -313,22 +156,21 @@ async function loadBudgetItems(activityId) {
         
         const budgetItems = await response.json();
         const tableBody = document.getElementById('budgetItemsTableBody');
-        
-        if (!tableBody) return;
-        
         tableBody.innerHTML = '';
         
         let totalAmount = 0;
         
         budgetItems.forEach(item => {
-            totalAmount += item.quantity * item.unit_price;
+            const itemTotal = item.quantity * item.unit_price;
+            totalAmount += itemTotal;
+            
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${item.item_name}</td>
                 <td>${item.description || '-'}</td>
                 <td>${item.quantity}</td>
                 <td>UGX ${item.unit_price.toLocaleString()}</td>
-                <td>UGX ${(item.quantity * item.unit_price).toLocaleString()}</td>
+                <td>UGX ${itemTotal.toLocaleString()}</td>
                 <td>${item.category}</td>
                 <td>
                     <button class="action-btn edit-btn" onclick="editBudgetItem(${item.id})">
@@ -342,25 +184,22 @@ async function loadBudgetItems(activityId) {
             tableBody.appendChild(row);
         });
         
-        // Add total row
-        const totalRow = document.createElement('tr');
-        totalRow.className = 'total-row';
-        totalRow.innerHTML = `
-            <td colspan="4">Total Budget</td>
-            <td>UGX ${totalAmount.toLocaleString()}</td>
-            <td colspan="2"></td>
-        `;
-        tableBody.appendChild(totalRow);
+        // Update total row
+        document.getElementById('budgetTotalAmount').textContent = `UGX ${totalAmount.toLocaleString()}`;
+        
     } catch (error) {
         console.error('Error loading budget items:', error);
-        if (document.getElementById('budgetItemsTableBody')) {
-            document.getElementById('budgetItemsTableBody').innerHTML = 
-                '<tr><td colspan="7" style="color: red;">Failed to load budget items</td></tr>';
-        }
+        document.getElementById('budgetItemsTableBody').innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: red;">
+                    Failed to load budget items: ${error.message}
+                </td>
+            </tr>
+        `;
     }
 }
 
-// Function to create a new budget item
+// Create a new budget item
 async function createBudgetItem() {
     const activityId = currentActivityId;
     const budgetData = {
@@ -373,12 +212,23 @@ async function createBudgetItem() {
     
     // Validate required fields
     if (!budgetData.item_name || isNaN(budgetData.quantity) || isNaN(budgetData.unit_price)) {
-        showToast('Please fill in all required fields with valid values', 'error');
+        showToast('Please fill in all required budget fields with valid values', 'error');
+        return;
+    }
+    
+    // Additional validation
+    if (budgetData.quantity <= 0 || budgetData.unit_price <= 0) {
+        showToast('Quantity and unit price must be greater than 0', 'error');
         return;
     }
     
     try {
-        const response = await fetch(`/activities/${activityId}/budget-items/`, {
+        const submitBtn = document.querySelector('#createBudgetModal .modal-footer .file-manager-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -400,17 +250,103 @@ async function createBudgetItem() {
         document.getElementById('budgetItemQuantity').value = '1';
         document.getElementById('budgetItemUnitPrice').value = '';
         
-        // Refresh budget items list
+        // Reload budget items
         loadBudgetItems(activityId);
+        
     } catch (error) {
         console.error('Error creating budget item:', error);
         showToast(`Failed to create budget item: ${error.message}`, 'error');
+    } finally {
+        const submitBtn = document.querySelector('#createBudgetModal .modal-footer .file-manager-btn');
+        if (submitBtn) {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
     }
 }
 
+// Edit a budget item
+async function editBudgetItem(itemId) {
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/budget-items/${itemId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch budget item');
+        }
+        
+        const item = await response.json();
+        
+        // Populate the form
+        document.getElementById('budgetItemName').value = item.item_name;
+        document.getElementById('budgetItemDescription').value = item.description || '';
+        document.getElementById('budgetItemQuantity').value = item.quantity;
+        document.getElementById('budgetItemUnitPrice').value = item.unit_price;
+        document.getElementById('budgetItemCategory').value = item.category;
+        
+        // Change the modal title and button text
+        document.querySelector('#createBudgetModal .modal-header h3').textContent = 'Edit Budget Item';
+        document.querySelector('#createBudgetModal .modal-footer .file-manager-btn').textContent = 'Update Item';
+        
+        // Store the item ID for update
+        document.getElementById('createBudgetModal').dataset.itemId = itemId;
+        
+    } catch (error) {
+        console.error('Error editing budget item:', error);
+        showToast(`Failed to load budget item for editing: ${error.message}`, 'error');
+    }
+}
+
+// Delete a budget item
+async function deleteBudgetItem(itemId) {
+    if (!confirm('Are you sure you want to delete this budget item?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/budget-items/${itemId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete budget item');
+        }
+        
+        showToast('Budget item deleted successfully!');
+        loadBudgetItems(currentActivityId);
+        
+    } catch (error) {
+        console.error('Error deleting budget item:', error);
+        showToast(`Failed to delete budget item: ${error.message}`, 'error');
+    }
+}
+
+// Show toast notifications
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast-message ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initBudgetApproval();
+});
+
 // Expose functions to global scope
+window.submitActivityBudget = submitActivityBudget;
 window.manageActivityBudget = manageActivityBudget;
 window.createBudgetItem = createBudgetItem;
-window.submitActivityBudget = submitActivityBudget;
-window.approveBudget = approveBudget;
-window.rejectBudget = rejectBudget;
+window.editBudgetItem = editBudgetItem;
+window.deleteBudgetItem = deleteBudgetItem;
