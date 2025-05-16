@@ -5657,9 +5657,12 @@ async function loadActivities() {
     <td>${activity.start_date || 'N/A'}</td>
     <td>${activity.end_date || 'N/A'}</td>
     <td>UGX ${activity.budget ? activity.budget.toLocaleString() : '0'}</td>
-    <td><span class="status-badge ${activity.status ? activity.status.replace(' ', '_') : 'planned'}">
-        ${activity.status || 'Planned'}
-    </span></td>
+    <td>
+        <span class="status-badge ${activity.status ? activity.status.replace(' ', '_') : 'planned'}">
+            ${activity.status || 'Planned'}
+        </span>
+        ${activity.status === 'approved' ? '<br><small>Budget Approved</small>' : ''}
+    </td>
     <td>
         <button class="action-btn view-btn" onclick="viewActivity(${activity.id})">
             <i class="fas fa-eye"></i>
@@ -5670,6 +5673,11 @@ async function loadActivities() {
         <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
             <i class="fas fa-coins"></i>
         </button>
+        ${activity.status !== 'approved' ? `
+        <button class="action-btn submit-btn" onclick="handleActivityBudgetSubmission(${activity.id}, '${activity.name}')">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+        ` : ''}
         <button class="action-btn delete-btn" onclick="deleteActivity(${activity.id})">
             <i class="fas fa-trash"></i>
         </button>
@@ -6736,6 +6744,359 @@ sync function loadProgramCards() {
         // You might want to show a user-friendly error message here
     }
 }
+
+async function submitBudgetForApproval(activityId, submittedByName) {
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/submit-budget/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `submitted_by=${encodeURIComponent(submittedByName)}`
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to submit budget for approval');
+        }
+        
+        const data = await response.json();
+        showToast('Budget submitted for approval successfully');
+        return data;
+    } catch (error) {
+        console.error('Error submitting budget for approval:', error);
+        showToast(`Error: ${error.message}`, 'error');
+        throw error;
+    }
+}
+
+// Function to load pending approvals for director
+async function loadPendingBudgetApprovals() {
+    try {
+        const response = await fetch('https://man-m681.onrender.com/budget-approvals/pending/');
+        if (!response.ok) throw new Error('Failed to fetch pending approvals');
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error loading pending approvals:', error);
+        showToast('Failed to load pending approvals', 'error');
+        return [];
+    }
+}
+
+// Function to approve a budget
+async function approveBudget(approvalId, approvedByName, comments = '') {
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/budget-approvals/${approvalId}/approve/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `approved_by=${encodeURIComponent(approvedByName)}&comments=${encodeURIComponent(comments)}`
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to approve budget');
+        }
+        
+        const data = await response.json();
+        showToast('Budget approved successfully! Funds deducted from accounts.');
+        return data;
+    } catch (error) {
+        console.error('Error approving budget:', error);
+        showToast(`Error: ${error.message}`, 'error');
+        throw error;
+    }
+}
+
+// Function to reject a budget
+async function rejectBudget(approvalId, rejectedByName, comments) {
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/budget-approvals/${approvalId}/reject/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `rejected_by=${encodeURIComponent(rejectedByName)}&comments=${encodeURIComponent(comments)}`
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to reject budget');
+        }
+        
+        const data = await response.json();
+        showToast('Budget rejected successfully');
+        return data;
+    } catch (error) {
+        console.error('Error rejecting budget:', error);
+        showToast(`Error: ${error.message}`, 'error');
+        throw error;
+    }
+}
+
+// Function to get budget approval status for an activity
+async function getActivityBudgetApproval(activityId) {
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-approval/`);
+        if (!response.ok) {
+            if (response.status === 404) {
+                return null; // No approval exists yet
+            }
+            throw new Error('Failed to fetch budget approval status');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching budget approval:', error);
+        return null;
+    }
+}
+
+// Helper function to show toast messages
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast-message ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+async function handleActivityBudgetSubmission(activityId, activityName) {
+    const approvalStatus = await getActivityBudgetApproval(activityId);
+    
+    if (approvalStatus) {
+        // Show current status
+        let statusMessage = `Budget status: ${approvalStatus.status}`;
+        if (approvalStatus.comments) {
+            statusMessage += ` - ${approvalStatus.comments}`;
+        }
+        showToast(statusMessage);
+        
+        if (approvalStatus.status === 'approved') {
+            // Budget is approved, show success
+            return;
+        }
+        
+        if (approvalStatus.status === 'submitted') {
+            // Budget is pending approval
+            showToast('Budget is already submitted and pending approval');
+            return;
+        }
+    }
+    
+    // If no approval or rejected, allow submission
+    if (confirm(`Submit budget for "${activityName}" for director approval?`)) {
+        try {
+            const userName = "Head of Programs"; // Replace with actual user name
+            await submitBudgetForApproval(activityId, userName);
+            
+            // Refresh activity status
+            loadActivities();
+        } catch (error) {
+            console.error('Budget submission failed:', error);
+        }
+    }
+}
+async function initDirectorDashboard() {
+    // Load pending approvals
+    const pendingApprovals = await loadPendingBudgetApprovals();
+    
+    // Create or update the approvals section
+    let approvalsSection = document.getElementById('budgetApprovalsSection');
+    if (!approvalsSection) {
+        approvalsSection = document.createElement('div');
+        approvalsSection.id = 'budgetApprovalsSection';
+        approvalsSection.className = 'dashboard-section';
+        approvalsSection.innerHTML = `
+            <div class="section-header">
+                <h2 class="section-title">Budget Approvals</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="modern-table" id="approvalsTable">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Project</th>
+                            <th>Submitted By</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approvalsTableBody">
+                        <!-- Approvals will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        `;
+        document.querySelector('.director-dashboard').appendChild(approvalsSection);
+    }
+    
+    const tbody = document.getElementById('approvalsTableBody');
+    tbody.innerHTML = '';
+    
+    if (pendingApprovals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No pending budget approvals</td></tr>';
+        return;
+    }
+    
+    pendingApprovals.forEach(approval => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${approval.activity_name}</td>
+            <td>${approval.project_name}</td>
+            <td>${approval.submitted_by}</td>
+            <td>UGX ${approval.total_amount.toLocaleString()}</td>
+            <td><span class="status-badge submitted">Pending</span></td>
+            <td>
+                <button class="action-btn approve-btn" onclick="showApproveModal(${approval.id}, '${approval.activity_name}')">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="action-btn reject-btn" onclick="showRejectModal(${approval.id}, '${approval.activity_name}')">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Modal for approval
+function showApproveModal(approvalId, activityName) {
+    const modalHTML = `
+        <div class="modal show" id="approveBudgetModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Approve Budget for ${activityName}</h3>
+                    <button class="close-btn" onclick="closeModal('approveBudgetModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="approveComments">Comments (Optional)</label>
+                        <textarea id="approveComments" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="file-manager-btn secondary" onclick="closeModal('approveBudgetModal')">
+                        Cancel
+                    </button>
+                    <button class="file-manager-btn" onclick="handleBudgetApproval(${approvalId}, true)">
+                        <i class="fas fa-check"></i> Confirm Approval
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Modal for rejection
+function showRejectModal(approvalId, activityName) {
+    const modalHTML = `
+        <div class="modal show" id="rejectBudgetModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Reject Budget for ${activityName}</h3>
+                    <button class="close-btn" onclick="closeModal('rejectBudgetModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="rejectComments">Reason for Rejection*</label>
+                        <textarea id="rejectComments" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="file-manager-btn secondary" onclick="closeModal('rejectBudgetModal')">
+                        Cancel
+                    </button>
+                    <button class="file-manager-btn delete-btn" onclick="handleBudgetApproval(${approvalId}, false)">
+                        <i class="fas fa-times"></i> Confirm Rejection
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Handle approval/rejection
+async function handleBudgetApproval(approvalId, isApproval) {
+    const userName = "Director"; // Replace with actual director name
+    const comments = isApproval 
+        ? document.getElementById('approveComments').value
+        : document.getElementById('rejectComments').value;
+    
+    if (!isApproval && !comments) {
+        showToast('Please provide a reason for rejection', 'error');
+        return;
+    }
+    
+    try {
+        if (isApproval) {
+            await approveBudget(approvalId, userName, comments);
+        } else {
+            await rejectBudget(approvalId, userName, comments);
+        }
+        
+        closeModal(isApproval ? 'approveBudgetModal' : 'rejectBudgetModal');
+        initDirectorDashboard(); // Refresh the approvals list
+    } catch (error) {
+        console.error('Approval action failed:', error);
+    }
+}
+
+// Call this when director dashboard loads
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('directorDashboard')) {
+        initDirectorDashboard();
+    }
+});
+const toastCSS = `
+.toast-message {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.toast-message.show {
+    opacity: 1;
+}
+
+.toast-message.success {
+    background-color: #2ecc71;
+}
+
+.toast-message.error {
+    background-color: #e74c3c;
+}
+`;
+
+// Add the CSS to the head
+const style = document.createElement('style');
+style.textContent = toastCSS;
+document.head.appendChild(style);
     </script>
     <script src="sidebarToggle.js"></script>
     <script src="navNavigation.js"></script>
