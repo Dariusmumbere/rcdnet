@@ -2932,6 +2932,30 @@
 .approval-actions .file-manager-btn {
     width: 100%;
 }
+/* Add to your existing CSS */
+.action-btn.approve-btn {
+    color: var(--success-color);
+}
+
+.action-btn.approve-btn:hover {
+    background-color: rgba(46, 204, 113, 0.1);
+}
+
+.action-btn.reject-btn {
+    color: var(--accent-color);
+}
+
+.action-btn.reject-btn:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.action-btn.submit-btn {
+    color: var(--warning-color);
+}
+
+.action-btn.submit-btn:hover {
+    background-color: rgba(241, 196, 15, 0.1);
+}
     </style>
 </head>
 <body>
@@ -3629,6 +3653,30 @@
                     </div>
                 </div>
             </div>
+            <!-- Budget Approval Modal -->
+<div class="project-modal" id="approvalModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Approve Budget</h3>
+            <button class="close-btn" onclick="closeModal('approvalModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Activity: <strong id="approvalActivityName"></strong></p>
+            <input type="hidden" id="approvalActivityId">
+            
+            <div class="form-group">
+                <label for="approvalRemarks">Remarks</label>
+                <textarea id="approvalRemarks" rows="3" placeholder="Optional comments"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="file-manager-btn secondary" onclick="closeModal('approvalModal')">Cancel</button>
+            <button class="file-manager-btn" onclick="submitBudgetApproval(true)">
+                <i class="fas fa-check"></i> Approve Budget
+            </button>
+        </div>
+    </div>
+</div>
 
             <!-- Upload Modal -->
             <div class="upload-modal" id="uploadModal">
