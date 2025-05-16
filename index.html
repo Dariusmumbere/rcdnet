@@ -6531,7 +6531,81 @@ function showToast(message, type = 'success') {
         }, 300);
     }, 3000);
 }
+async function loadDirectorDashboard() {
+    try {
+        // Load pending approvals
+        const approvals = await getPendingBudgetApprovals();
+        const approvalsContainer = document.getElementById('pendingApprovalsContainer');
+        
+        if (approvals.length === 0) {
+            approvalsContainer.innerHTML = '<p>No pending budget approvals</p>';
+            return;
+        }
+        
+        approvalsContainer.innerHTML = `
+            <h3><i class="fas fa-clipboard-check"></i> Pending Budget Approvals</h3>
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Project</th>
+                            <th>Amount (UGX)</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingApprovalsTableBody">
+                        ${approvals.map(approval => `
+                            <tr>
+                                <td>${approval.activity_name}</td>
+                                <td>${approval.project_name}</td>
+                                <td>${approval.budget.toLocaleString()}</td>
+                                <td>${new Date(approval.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="action-btn approve-btn" onclick="approveBudget(${approval.id})">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="action-btn reject-btn" onclick="rejectBudget(${approval.id})">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading director dashboard:', error);
+    }
+}
 
+// Add budget approval functions
+async function approveBudget(approvalId) {
+    const remarks = prompt('Enter approval remarks (optional):');
+    try {
+        await processBudgetApproval(approvalId, true, remarks);
+        loadDirectorDashboard();
+    } catch (error) {
+        console.error('Error approving budget:', error);
+    }
+}
+
+async function rejectBudget(approvalId) {
+    const remarks = prompt('Enter rejection reason (required):');
+    if (!remarks) {
+        alert('Please provide a reason for rejection');
+        return;
+    }
+    
+    try {
+        await processBudgetApproval(approvalId, false, remarks);
+        loadDirectorDashboard();
+    } catch (error) {
+        console.error('Error rejecting budget:', error);
+    }
+}
     </script>
     <script src="sidebarToggle.js"></script>
     <script src="navNavigation.js"></script>
