@@ -1,164 +1,129 @@
-// Add this to your existing FastAPI backend code
+// Update your submitDonation function to use the new endpoint
+async function submitDonation() {
+    const donationId = document.getElementById('addDonationModal').dataset.donationId;
+    const isEdit = !!donationId;
+    
+    const donorName = document.getElementById('donorName').value;
+    const donationAmount = parseFloat(document.getElementById('donationAmount').value);
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const donationDate = document.getElementById('donationDate').value;
+    const donationProject = document.getElementById('donationProject').value;
+    const donationNotes = document.getElementById('donationNotes').value;
 
-@app.post("/donations/with-stats/", response_model=Donation)
-def create_donation_with_stats(donation: DonationCreate):
-    conn = None
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        # First, get or create the donor
-        cursor.execute('''
-            SELECT id FROM donors WHERE name = %s
-        ''', (donation.donor_name,))
-        donor = cursor.fetchone()
-        
-        donor_id = None
-        if donor:
-            donor_id = donor[0]
-        else:
-            # Create a new donor if not exists
-            cursor.execute('''
-                INSERT INTO donors (name, donor_type, category)
-                VALUES (%s, 'individual', 'one-time')
-                RETURNING id
-            ''', (donation.donor_name,))
-            donor_id = cursor.fetchone()[0]
-        
-        # Insert donation with donor_id
-        cursor.execute('''
-            INSERT INTO donations (donor_id, donor_name, amount, payment_method, date, project, notes, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed')
-            RETURNING id, donor_name, amount, payment_method, date, project, notes, status, created_at
-        ''', (
-            donor_id,
-            donation.donor_name,
-            donation.amount,
-            donation.payment_method,
-            donation.date,
-            donation.project,
-            donation.notes
-        ))
-        
-        new_donation = cursor.fetchone()
-        
-        # Update donor statistics
-        cursor.execute('''
-            UPDATE donors
-            SET 
-                stats = jsonb_build_object(
-                    'donation_count', COALESCE((SELECT COUNT(*) FROM donations WHERE donor_id = donors.id), 0),
-                    'total_donated', COALESCE((SELECT SUM(amount) FROM donations WHERE donor_id = donors.id), 0),
-                    'first_donation', (SELECT MIN(date) FROM donations WHERE donor_id = donors.id),
-                    'last_donation', (SELECT MAX(date) FROM donations WHERE donor_id = donors.id)
-                )
-            WHERE id = %s
-        ''', (donor_id,))
-        
-        # Update the appropriate program area balance if project is specified
-        if donation.project:
-            cursor.execute('''
-                UPDATE program_areas
-                SET balance = balance + %s
-                WHERE name = %s
-                RETURNING balance
-            ''', (donation.amount, donation.project))
+    if (!donorName || !donationAmount || !paymentMethod || !donationDate) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    try {
+        const submitBtn = document.querySelector('#addDonationModal .modal-footer .file-manager-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+
+        const url = isEdit 
+            ? `https://man-m681.onrender.com/donations/${donationId}`
+            : 'https://man-m681.onrender.com/donations/with-stats/';
             
-            if not cursor.fetchone():
-                raise HTTPException(status_code=400, detail=f"Program area '{donation.project}' not found")
-        
-        # Update main account balance
-        cursor.execute('''
-            UPDATE bank_accounts
-            SET balance = balance + %s
-            WHERE name = 'Main Account'
-            RETURNING balance
-        ''', (donation.amount,))
-        
-        if not cursor.fetchone():
-            raise HTTPException(status_code=500, detail="Main account not found")
-        
-        conn.commit()
-        
-        return {
-            "id": new_donation[0],
-            "donor_name": new_donation[1],
-            "amount": new_donation[2],
-            "payment_method": new_donation[3],
-            "date": new_donation[4],
-            "project": new_donation[5],
-            "notes": new_donation[6],
-            "status": new_donation[7],
-            "created_at": new_donation[8]
-        }
-    except Exception as e:
-        logger.error(f"Error creating donation with stats: {e}")
-        if conn:
-            conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        if conn:
-            conn.close()
+        const method = isEdit ? 'PUT' : 'POST';
 
-# Update the Donor model to include stats
-class Donor(BaseModel):
-    id: Optional[int] = None
-    name: str
-    email: Optional[str] = None
-    phone: Optional[str] = None
-    address: Optional[str] = None
-    donor_type: Optional[str] = None
-    notes: Optional[str] = None
-    category: Optional[str] = "one-time"
-    created_at: Optional[datetime] = None
-    stats: Optional[Dict] = None  # Changed from DonorStats to Dict for flexibility
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                donor_name: donorName,
+                amount: donationAmount,
+                payment_method: paymentMethod,
+                date: donationDate,
+                project: donationProject,
+                notes: donationNotes,
+                status: "completed"
+            })
+        });
 
-# Update the donor retrieval endpoint to include stats
-@app.get("/donors/{donor_id}", response_model=Donor)
-def get_donor(donor_id: int):
-    conn = None
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
+        if (!response.ok) {
+            throw new Error('Failed to submit donation');
+        }
+
+        const data = await response.json();
         
-        # Get donor basic info
-        cursor.execute('''
-            SELECT id, name, email, phone, address, donor_type, notes, category, created_at
-            FROM donors
-            WHERE id = %s
-        ''', (donor_id,))
+        // Refresh dashboard data
+        await loadDashboardSummary();
         
-        donor = cursor.fetchone()
-        if not donor:
-            raise HTTPException(status_code=404, detail="Donor not found")
-            
-        # Get donor statistics from the stats JSON column
-        cursor.execute('''
-            SELECT stats FROM donors WHERE id = %s
-        ''', (donor_id,))
+        // Refresh donations table
+        await loadDonations();
         
-        stats = cursor.fetchone()[0] or {
-            "donation_count": 0,
-            "total_donated": 0,
-            "first_donation": None,
-            "last_donation": None
+        if (isEdit) {
+            // Update existing receipt
+            const receiptElement = document.getElementById(`receipt-${donationId}`);
+            if (receiptElement) {
+                receiptElement.remove();
+            }
         }
         
-        return {
-            "id": donor[0],
-            "name": donor[1],
-            "email": donor[2],
-            "phone": donor[3],
-            "address": donor[4],
-            "donor_type": donor[5],
-            "notes": donor[6],
-            "category": donor[7],
-            "created_at": donor[8],
-            "stats": stats
+        // Generate receipt for the new/updated donation
+        generateReceipt(data);
+        
+        // Show success message
+        alert(`Donation ${isEdit ? 'updated' : 'submitted'} successfully!`);
+        closeDonationModal();
+        document.getElementById('donationForm').reset();
+        
+    } catch (error) {
+        console.error('Error submitting donation:', error);
+        alert(`Failed to ${isEdit ? 'update' : 'submit'} donation. Please try again.`);
+    } finally {
+        // Restore button state
+        const submitBtn = document.querySelector('#addDonationModal .modal-footer .file-manager-btn');
+        submitBtn.innerHTML = isEdit ? 'Update Donation' : 'Save Donation';
+        submitBtn.disabled = false;
+    }
+}
+
+// Update the donor profile display to show the stats
+async function loadDonorData(donorId) {
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to fetch donor data');
         }
-    except Exception as e:
-        logger.error(f"Error fetching donor: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch donor")
-    finally:
-        if conn:
-            conn.close()
+        
+        const donor = await response.json();
+        
+        // Populate form
+        document.getElementById('donorId').value = donor.id;
+        document.getElementById('donorProfileName').value = donor.name;
+        document.getElementById('donorEmail').value = donor.email || '';
+        document.getElementById('donorPhone').value = donor.phone || '';
+        document.getElementById('donorAddress').value = donor.address || '';
+        document.getElementById('donorType').value = donor.donor_type || 'individual';
+        document.getElementById('donorCategory').value = donor.category || 'one-time';
+        document.getElementById('donorNotes').value = donor.notes || '';
+        
+        // Update stats in the modal
+        if (donor.stats) {
+            document.getElementById('totalDonations').textContent = `UGX ${donor.stats.total_donated?.toLocaleString() || '0'}`;
+            document.getElementById('donationCount').textContent = donor.stats.donation_count || '0';
+            document.getElementById('firstDonation').textContent = donor.stats.first_donation ? 
+                new Date(donor.stats.first_donation).toLocaleDateString() : '-';
+            document.getElementById('lastDonation').textContent = donor.stats.last_donation ? 
+                new Date(donor.stats.last_donation).toLocaleDateString() : '-';
+        } else {
+            // Initialize empty stats if none exist
+            document.getElementById('totalDonations').textContent = 'UGX 0';
+            document.getElementById('donationCount').textContent = '0';
+            document.getElementById('firstDonation').textContent = '-';
+            document.getElementById('lastDonation').textContent = '-';
+        }
+        
+        // Load donation history
+        loadDonorDonations(donorId);
+    } catch (error) {
+        console.error('Error loading donor data:', error);
+        alert(`Failed to load donor data: ${error.message}`);
+    }
+}
