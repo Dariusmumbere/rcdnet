@@ -4,7 +4,7 @@ function downloadFile(fileId, fileName) {
     
     // Set the file URL (you'll need to replace this with your actual file endpoint)
     // This is a placeholder - you'll need to implement the actual file download endpoint
-    const fileUrl = `https://your-api-endpoint.com/files/${fileId}/download`;
+    const fileUrl = `https://man-m681.onrender.com/files/{file_id}/download`;
     
     // Set the download attributes
     downloadLink.href = fileUrl;
