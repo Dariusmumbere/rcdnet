@@ -93,7 +93,7 @@ async function loadDonations() {
         const donationsTableBody = document.getElementById('donationsTableBody');
         donationsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading donations...</td></tr>';
         
-        const response = await fetch('https://man-m681.onrender.com/donations/');
+        const response = await fetch('https://backend-jz65.onrender.com/donations/');
         
         if (!response.ok) {
             throw new Error('Failed to fetch donations');
@@ -138,7 +138,7 @@ async function loadDonations() {
 
 async function viewDonation(donationId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donations/${donationId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`);
         if (!response.ok) throw new Error('Failed to fetch donation');
         
         const donation = await response.json();
@@ -209,7 +209,7 @@ async function editDonation(donationId) {
         // Close any open modals
         closeModal('viewDonationModal');
         
-        const response = await fetch(`https://man-m681.onrender.com/donations/${donationId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`);
         if (!response.ok) throw new Error('Failed to fetch donation');
         
         const donation = await response.json();
@@ -243,7 +243,7 @@ async function deleteDonation(donationId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donations/${donationId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`, {
             method: 'DELETE'
         });
         
@@ -290,8 +290,8 @@ async function submitDonation() {
         submitBtn.disabled = true;
 
         const url = isEdit 
-            ? `https://man-m681.onrender.com/donations/${donationId}`
-            : 'https://man-m681.onrender.com/donations/';
+            ? `https://backend-jz65.onrender.com/donations/${donationId}`
+            : 'https://backend-jz65.onrender.com/donations/';
             
         const method = isEdit ? 'PUT' : 'POST';
 
@@ -359,7 +359,7 @@ function closeDonationModal() {
 // Receipts functionality
 async function loadReceipts() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/donations/');
+        const response = await fetch('https://backend-jz65.onrender.com/donations/');
         if (!response.ok) throw new Error('Failed to fetch donations');
         
         const donations = await response.json();
@@ -553,8 +553,8 @@ async function loadDonorProfiles(search = '') {
         
         // Fetch donors and their stats in parallel
         const [donorsResponse, statsResponse] = await Promise.all([
-            fetch(`https://man-m681.onrender.com/donors/?search=${encodeURIComponent(search)}`),
-            fetch('https://man-m681.onrender.com/donors/stats/')
+            fetch(`https://backend-jz65.onrender.com/donors/?search=${encodeURIComponent(search)}`),
+            fetch('https://backend-jz65.onrender.com/donors/stats/')
         ]);
         
         if (!donorsResponse.ok || !statsResponse.ok) {
@@ -666,7 +666,7 @@ function closeDonorModal() {
 
 async function loadDonorData(donorId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`);
         
         if (!response.ok) {
             const error = await response.json();
@@ -695,7 +695,7 @@ async function loadDonorData(donorId) {
 
 async function loadDonorDonations(donorId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}/donations`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}/donations`);
         if (!response.ok) throw new Error('Failed to fetch donor donations');
         
         const data = await response.json();
@@ -756,8 +756,8 @@ async function saveDonor() {
     try {
         const isEdit = !!currentDonorId;
         const url = isEdit 
-            ? `https://man-m681.onrender.com/donors/${currentDonorId}`
-            : 'https://man-m681.onrender.com/donors/';
+            ? `https://backend-jz65.onrender.com/donors/${currentDonorId}`
+            : 'https://backend-jz65.onrender.com/donors/';
         const method = isEdit ? 'PUT' : 'POST';
         
         // Show loading state
@@ -848,7 +848,7 @@ async function deleteDonor(donorId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`, {
             method: 'DELETE'
         });
         
@@ -871,8 +871,8 @@ function viewDonorHistory(donorId) {
 async function loadDonationHistory(donorId) {
     try {
         const [donorResponse, historyResponse] = await Promise.all([
-            fetch(`https://man-m681.onrender.com/donors/${donorId}`),
-            fetch(`https://man-m681.onrender.com/donors/${donorId}/donations`)
+            fetch(`https://backend-jz65.onrender.com/donors/${donorId}`),
+            fetch(`https://backend-jz65.onrender.com/donors/${donorId}/donations`)
         ]);
 
         if (!donorResponse.ok || !historyResponse.ok) {
@@ -1135,7 +1135,7 @@ function closeModal(modalId) {
 
 async function loadDashboardSummary() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/dashboard-summary/');
+        const response = await fetch('https://backend-jz65.onrender.com/dashboard-summary/');
         if (!response.ok) throw new Error('Failed to fetch dashboard data');
         
         const data = await response.json();
@@ -1148,7 +1148,7 @@ async function loadDashboardSummary() {
 
 async function populateDonorDropdown() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/donors/');
+        const response = await fetch('https://backend-jz65.onrender.com/donors/');
         if (!response.ok) throw new Error('Failed to fetch donors');
         
         const donors = await response.json();
