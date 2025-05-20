@@ -17,7 +17,7 @@ async function deleteDonation(donationId) {
         }
 
         // Call the delete endpoint
-        const response = await fetch(`https://man-m681.onrender.com/donations/${donationId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`, {
             method: 'DELETE'
         });
 
