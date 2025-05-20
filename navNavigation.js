@@ -110,7 +110,7 @@ async function loadProgramCards() {
         console.log('Loading program cards...');
         
         // Fetch data from your dashboard-summary endpoint
-        const response = await fetch('https://man-m681.onrender.com/dashboard-summary/');
+        const response = await fetch('https://backend-jz65.onrender.com/dashboard-summary/');
         
         if (!response.ok) {
             throw new Error('Failed to fetch dashboard data');
