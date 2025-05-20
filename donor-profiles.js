@@ -36,7 +36,7 @@ function closeDonorModal() {
 // Function to load donor data
 async function loadDonorData(donorId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`);
         
         if (!response.ok) {
             const error = await response.json();
@@ -66,7 +66,7 @@ async function loadDonorData(donorId) {
 // Function to load donor's donations
 async function loadDonorDonations(donorId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}/donations`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}/donations`);
         if (!response.ok) throw new Error('Failed to fetch donor donations');
         
         const data = await response.json();
@@ -128,8 +128,8 @@ async function saveDonor() {
     try {
         const isEdit = !!currentDonorId;
         const url = isEdit 
-            ? `https://man-m681.onrender.com/donors/${currentDonorId}`
-            : 'https://man-m681.onrender.com/donors/';
+            ? `https://backend-jz65.onrender.com/donors/${currentDonorId}`
+            : 'https://backend-jz65.onrender.com/donors/';
         const method = isEdit ? 'PUT' : 'POST';
         
         // Show loading state
@@ -219,7 +219,7 @@ async function loadDonorProfiles(search = '') {
         const container = document.querySelector('.donor-cards');
         container.innerHTML = '<div class="loading">Loading donors...</div>';
         
-        const response = await fetch(`https://man-m681.onrender.com/donors/?search=${encodeURIComponent(search)}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/?search=${encodeURIComponent(search)}`);
         
         if (!response.ok) {
             throw new Error('Failed to fetch donors');
@@ -293,7 +293,7 @@ async function deleteDonor(donorId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${dononst response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${dononst response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`, {
             method: 'DELETE'
         });
         
@@ -317,8 +317,8 @@ function viewDonorHistory(donorId) {
 async function loadDonationHistory(donorId) {
     try {
         const [donorResponse, historyResponse] = await Promise.all([
-            fetch(`https://man-m681.onrender.com/donors/${donorId}`),
-            fetch(`https://man-m681.onrender.com/donors/${donorId}/donations`)
+            fetch(`https://backend-jz65.onrender.com/donors/${donorId}`),
+            fetch(`https://backend-jz65.onrender.com/donors/${donorId}/donations`)
         ]);
 
         if (!donorResponse.ok || !historyResponse.ok) {
