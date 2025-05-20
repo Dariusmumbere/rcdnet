@@ -21,7 +21,7 @@ function setupCreateActivityButton() {
 // Function to load projects for the activities dropdown
 async function loadProjectsForActivities() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/projects/');
+        const response = await fetch('https://backend-jz65.onrender.com/projects/');
         if (!response.ok) throw new Error('Failed to fetch projects');
         
         const data = await response.json();
@@ -74,7 +74,7 @@ async function createActivity() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         submitBtn.disabled = true;
         
-        const response = await fetch('https://man-m681.onrender.com/activities/', {
+        const response = await fetch('https://backend-jz65.onrender.com/activities/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ async function loadActivities() {
         const tableBody = document.getElementById('activitiesTableBody');
         tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading activities...</td></tr>';
         
-        const response = await fetch('https://man-m681.onrender.com/activities/');
+        const response = await fetch('https://backend-jz65.onrender.com/activities/');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -216,7 +216,7 @@ window.createActivity = createActivity;
 // View activity details
 async function viewActivity(activityId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`);
         if (!response.ok) throw new Error('Failed to fetch activity');
         
         const activity = await response.json();
@@ -289,7 +289,7 @@ async function editActivity(activityId) {
             closeModal('viewActivityModal');
         }
         
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`);
         if (!response.ok) throw new Error('Failed to fetch activity');
         
         const activity = await response.json();
@@ -346,7 +346,7 @@ async function deleteActivity(activityId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`, {
             method: 'DELETE'
         });
         
@@ -365,7 +365,7 @@ async function deleteActivity(activityId) {
 // Helper function to load projects for activities dropdown
 async function loadProjectsForActivities() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/projects/');
+        const response = await fetch('https://backend-jz65.onrender.com/projects/');
         if (!response.ok) throw new Error('Failed to fetch projects');
         
         const data = await response.json();
@@ -478,7 +478,7 @@ async function loadActivityBudgetItems(activityId) {
         const tbody = document.getElementById('budgetItemsTableBody');
         tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading budget items...</td></tr>';
         
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`);
         if (!response.ok) throw new Error('Failed to fetch budget items');
         
         const budgetItems = await response.json();
@@ -550,7 +550,7 @@ async function addBudgetItem() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
         submitBtn.disabled = true;
         
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -591,7 +591,7 @@ async function deleteBudgetItem(itemId, activityId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/budget-items/${itemId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/budget-items/${itemId}`, {
             method: 'DELETE'
         });
         
@@ -620,7 +620,7 @@ async function submitBudgetApproval(approved) {
     const remarks = document.getElementById('approvalRemarks').value;
     
     try {
-        const response = await fetch('https://man-m681.onrender.com/budget-approvals/', {
+        const response = await fetch('https://backend-jz65.onrender.com/budget-approvals/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -697,7 +697,7 @@ async function submitForApproval(activityId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
