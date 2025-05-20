@@ -74,7 +74,7 @@ function showBudgetManagementModal(activityId, activityName) {
 // Function to load budget items for an activity
 async function loadBudgetItems(activityId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items`);
         if (!response.ok) throw new Error('Failed to fetch budget items');
         
         const budgetItems = await response.json();
@@ -154,7 +154,7 @@ async function createBudgetItem() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         submitBtn.disabled = true;
         
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ async function submitBudgetForApproval(activityId) {
         const activityName = document.getElementById('budgetActivityName').textContent;
         
         // First check if there's already an approval request
-        const response = await fetch(`https://man-m681.onrender.com/budget-approvals/activity/${activityId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/budget-approvals/activity/${activityId}`);
         
         if (response.ok) {
             const existingApproval = await response.json();
@@ -198,13 +198,13 @@ async function submitBudgetForApproval(activityId) {
         }
         
         // Get activity details to know the requested amount
-        const activityResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}`);
+        const activityResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`);
         if (!activityResponse.ok) throw new Error('Failed to fetch activity details');
         
         const activity = await activityResponse.json();
         
         // Create approval request
-        const approvalResponse = await fetch('https://man-m681.onrender.com/budget-approvals', {
+        const approvalResponse = await fetch('https://backend-jz65.onrender.com/budget-approvals', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ async function loadPendingApprovals() {
         const container = document.getElementById('pendingApprovalsContainer');
         container.innerHTML = '<div class="loading">Loading pending approvals...</div>';
         
-        const response = await fetch('https://man-m681.onrender.com/budget-approvals/pending');
+        const response = await fetch('https://backend-jz65.onrender.com/budget-approvals/pending');
         if (!response.ok) throw new Error('Failed to fetch pending approvals');
         
         const approvals = await response.json();
@@ -302,7 +302,7 @@ async function approveBudget(approvalId, isApproved) {
             return;
         }
         
-        const response = await fetch(`https://man-m681.onrender.com/budget-approvals/${approvalId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/budget-approvals/${approvalId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -328,7 +328,7 @@ async function approveBudget(approvalId, isApproved) {
 // Function to check approval status for an activity
 async function checkApprovalStatus(activityId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/budget-approvals/activity/${activityId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/budget-approvals/activity/${activityId}`);
         
         if (!response.ok) {
             if (response.status === 404) {
