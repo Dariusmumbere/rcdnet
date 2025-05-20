@@ -147,7 +147,7 @@ function createBudgetModal(activityName) {
 // Load budget items for an activity
 async function loadActivityBudgetItems(activityId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`);
         
         if (!response.ok) {
             throw new Error('Failed to fetch budget items');
@@ -223,7 +223,7 @@ async function createBudgetItem() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         submitBtn.disabled = true;
         
-        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -264,7 +264,7 @@ async function deleteBudgetItem(itemId, activityId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/budget-items/${itemId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/budget-items/${itemId}`, {
             method: 'DELETE'
         });
         
@@ -285,13 +285,13 @@ async function deleteBudgetItem(itemId, activityId) {
 async function submitBudgetForApproval(activityId) {
     try {
         // First get the activity details to determine the program area
-        const activityResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}`);
+        const activityResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`);
         if (!activityResponse.ok) throw new Error('Failed to fetch activity details');
         
         const activity = await activityResponse.json();
         
         // Get the project to determine the program area
-        const projectResponse = await fetch(`https://man-m681.onrender.com/projects/${activity.project_id}`);
+        const projectResponse = await fetch(`https://backend-jz65.onrender.com/projects/${activity.project_id}`);
         if (!projectResponse.ok) throw new Error('Failed to fetch project details');
         
         const project = await projectResponse.json();
@@ -302,14 +302,14 @@ async function submitBudgetForApproval(activityId) {
         currentProgramArea = programArea;
         
         // Calculate total budget
-        const budgetItemsResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
+        const budgetItemsResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`);
         if (!budgetItemsResponse.ok) throw new Error('Failed to fetch budget items');
         
         const budgetItems = await budgetItemsResponse.json();
         const totalBudget = budgetItems.reduce((sum, item) => sum + item.total, 0);
         
         // Update activity status to "pending_approval"
-        const updateResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}`, {
+        const updateResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -342,7 +342,7 @@ async function submitBudgetForApproval(activityId) {
 // Load pending approvals for director
 async function loadPendingApprovals() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/activities/?status=pending_approval');
+        const response = await fetch('https://backend-jz65.onrender.com/activities/?status=pending_approval');
         
         if (!response.ok) {
             throw new Error('Failed to fetch pending approvals');
@@ -410,20 +410,20 @@ async function viewBudgetDetails(activityId) {
     
     try {
         // Get activity details
-        const activityResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}`);
+        const activityResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`);
         if (!activityResponse.ok) throw new Error('Failed to fetch activity details');
         
         const activity = await activityResponse.json();
         
         // Get budget items
-        const budgetItemsResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
+        const budgetItemsResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`);
         if (!budgetItemsResponse.ok) throw new Error('Failed to fetch budget items');
         
         const budgetItems = await budgetItemsResponse.json();
         const totalBudget = budgetItems.reduce((sum, item) => sum + item.total, 0);
         
         // Get project to determine program area
-        const projectResponse = await fetch(`https://man-m681.onrender.com/projects/${activity.project_id}`);
+        const projectResponse = await fetch(`https://backend-jz65.onrender.com/projects/${activity.project_id}`);
         if (!projectResponse.ok) throw new Error('Failed to fetch project details');
         
         const project = await projectResponse.json();
@@ -567,7 +567,7 @@ async function approveActivityBudget(activityId, approved) {
         
         // Update activity status
         const status = approved ? 'approved' : 'rejected';
-        const activityResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}`, {
+        const activityResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -582,14 +582,14 @@ async function approveActivityBudget(activityId, approved) {
         if (approved) {
             // Deduct funds from program area and main account
             // First get the total budget
-            const budgetItemsResponse = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
+            const budgetItemsResponse = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`);
             if (!budgetItemsResponse.ok) throw new Error('Failed to fetch budget items');
             
             const budgetItems = await budgetItemsResponse.json();
             const totalBudget = budgetItems.reduce((sum, item) => sum + item.total, 0);
             
             // Deduct from program area
-            const programResponse = await fetch(`https://man-m681.onrender.com/program_areas/${currentProgramArea}/deduct`, {
+            const programResponse = await fetch(`https://backend-jz65.onrender.com/program_areas/${currentProgramArea}/deduct`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -602,7 +602,7 @@ async function approveActivityBudget(activityId, approved) {
             if (!programResponse.ok) throw new Error('Failed to deduct from program area');
             
             // Deduct from main account
-            const mainAccountResponse = await fetch(`https://man-m681.onrender.com/bank_accounts/main/deduct`, {
+            const mainAccountResponse = await fetch(`https://backend-jz65.onrender.com/bank_accounts/main/deduct`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -651,7 +651,7 @@ async function notifyBudgetApproval(activityId, approved, remarks) {
 // Load program cards with current balances
 async function loadProgramCards() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/dashboard-summary/');
+        const response = await fetch('https://backend-jz65.onrender.com/dashboard-summary/');
         
         if (!response.ok) {
             throw new Error('Failed to fetch dashboard data');
