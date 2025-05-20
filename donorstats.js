@@ -22,8 +22,8 @@ async function submitDonation() {
         submitBtn.disabled = true;
 
         const url = isEdit 
-            ? `https://man-m681.onrender.com/donations/${donationId}`
-            : 'https://man-m681.onrender.com/donations/with-stats/';
+            ? `https://backend-jz65.onrender.com/donations/${donationId}`
+            : 'https://backend-jz65.onrender.com/donations/with-stats/';
             
         const method = isEdit ? 'PUT' : 'POST';
 
@@ -85,7 +85,7 @@ async function submitDonation() {
 // Update the donor profile display to show the stats
 async function loadDonorData(donorId) {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`);
         
         if (!response.ok) {
             const error = await response.json();
