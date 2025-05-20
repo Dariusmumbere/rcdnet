@@ -106,7 +106,7 @@ async function loadProgramAreaProjects(programAreaId) {
         const tableBody = document.getElementById('programAreaProjectsTableBody');
         tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading projects...</td></tr>';
         
-        const response = await fetch(`https://man-m681.onrender.com/program_areas/${programAreaId}/projects/`);
+        const response = await fetch(`https://backend-jz65.onrender.com/program_areas/${programAreaId}/projects/`);
         
         if (!response.ok) {
             throw new Error('Failed to fetch projects');
