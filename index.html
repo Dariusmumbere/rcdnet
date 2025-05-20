@@ -12,10 +12,6 @@
     <script src="donations-management.js"></script>
     <script src="folders.js"></script>
     <script src="activities.js"></script>
-    <script src="delete-donation.js"></script>
-    <script src="donor-profiles.js"></script>
-    <script src="downloadreceipt.js"></script>
-    <script src="donorstats.js"></script>
     
     <style>
         :root {
@@ -2819,37 +2815,15 @@
     border-color: var(--primary-color);
     background-color: rgba(52, 152, 219, 0.1);
 }
-/* Add to your existing CSS */
-.toast-message {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1001;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.toast-message.show {
-    opacity: 1;
-}
-
-.toast-message.success {
-    background-color: var(--success-color);
-}
-
-.toast-message.error {
-    background-color: var(--accent-color);
+.status-badge.pending {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+    border: 1px solid rgba(243, 156, 18, 0.2);
 }
 
 .status-badge.approved {
     background-color: rgba(46, 204, 113, 0.1);
-    color: #27ae60;
+    color: #2ecc71;
     border: 1px solid rgba(46, 204, 113, 0.2);
 }
 
@@ -2859,192 +2833,43 @@
     border: 1px solid rgba(231, 76, 60, 0.2);
 }
 
-.status-badge.pending {
-    background-color: rgba(52, 152, 219, 0.1);
-    color: #2980b9;
-    border: 1px solid rgba(52, 152, 219, 0.2);
-}
-
-.status-badge.draft {
-    background-color: rgba(149, 165, 166, 0.1);
-    color: #7f8c8d;
-    border: 1px solid rgba(149, 165, 166, 0.2);
-}
-
-.action-btn.approve-btn {
-    color: var(--success-color);
-}
-
-.action-btn.reject-btn {
-    color: var(--accent-color);
-}
-
-.action-btn.submit-btn {
-    color: var(--primary-color);
-}
-.action-btn.submit-btn {
-    color: var(--primary-color);
-}
-
-.action-btn.submit-btn:hover {
-    background-color: rgba(52, 152, 219, 0.1);
-}
-.approval-card {
-    background-color: white;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.approval-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
+/* Approval details styling */
 .approval-details {
-    margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
-.approval-actions {
-    margin-top: 15px;
+.detail-row {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.approval-actions input[type="number"],
-.approval-actions textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.approval-actions textarea {
-    min-height: 60px;
-    resize: vertical;
-}
-
-.approval-actions .file-manager-btn {
-    width: 100%;
-}
-/* Add to your existing CSS */
-.action-btn.approve-btn {
-    color: var(--success-color);
-}
-
-.action-btn.approve-btn:hover {
-    background-color: rgba(46, 204, 113, 0.1);
-}
-
-.action-btn.reject-btn {
-    color: var(--accent-color);
-}
-
-.action-btn.reject-btn:hover {
-    background-color: rgba(231, 76, 60, 0.1);
-}
-
-.action-btn.submit-btn {
-    color: var(--warning-color);
-}
-
-.action-btn.submit-btn:hover {
-    background-color: rgba(241, 196, 15, 0.1);
-}
-
-/* Modern Datalist Dropdown Styles */
-input[list] {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 1rem;
-    background-color: #fff;
-    transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-input[list]:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-    outline: none;
-}
-
-datalist {
-    position: absolute;
-    max-height: 300px;
-    overflow-y: auto;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    width: calc(100% - 30px); /* Match input width minus padding */
-    margin-top: 5px;
-}
-
-datalist option {
-    padding: 12px 15px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #333;
-    border-bottom: 1px solid #f5f5f5;
-    font-size: 0.95rem;
-}
-
-datalist option:hover {
-    background-color: #f8f9fa;
-    color: var(--primary-color);
-}
-
-datalist option:last-child {
-    border-bottom: none;
-}
-
-datalist option:focus {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-/* Custom scrollbar for dropdown */
-datalist::-webkit-scrollbar {
-    width: 8px;
-}
-
-datalist::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 0 8px 8px 0;
-}
-
-datalist::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-datalist::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Animation for dropdown appearance */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-datalist {
-    animation: fadeIn 0.2s ease-out;
-}
-
-/* Highlight matching text */
-.highlight-match {
+.detail-label {
     font-weight: 600;
-    color: var(--primary-color);
+    color: #555;
+    width: 120px;
+}
+
+.detail-value {
+    flex: 1;
+}
+
+/* Approval badge in header */
+.approval-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
     </style>
 </head>
@@ -3743,30 +3568,6 @@ datalist {
                     </div>
                 </div>
             </div>
-            <!-- Budget Approval Modal -->
-<div class="project-modal" id="approvalModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Approve Budget</h3>
-            <button class="close-btn" onclick="closeModal('approvalModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p>Activity: <strong id="approvalActivityName"></strong></p>
-            <input type="hidden" id="approvalActivityId">
-            
-            <div class="form-group">
-                <label for="approvalRemarks">Remarks</label>
-                <textarea id="approvalRemarks" rows="3" placeholder="Optional comments"></textarea>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="file-manager-btn secondary" onclick="closeModal('approvalModal')">Cancel</button>
-            <button class="file-manager-btn" onclick="submitBudgetApproval(true)">
-                <i class="fas fa-check"></i> Approve Budget
-            </button>
-        </div>
-    </div>
-</div>
 
             <!-- Upload Modal -->
             <div class="upload-modal" id="uploadModal">
@@ -3905,18 +3706,7 @@ datalist {
             <div class="bank-card-balance">0</div>
         </div>
     </div>
-    
-</div>
-    <div class="approval-section">
-    <div class="section-header">
-        <h3 class="section-title">Pending Budget Approvals</h3>
-        <button class="file-manager-btn secondary" id="refreshApprovalsBtn">
-            <i class="fas fa-sync-alt"></i> Refresh
-        </button>
-    </div>
-    <div id="pendingApprovalsContainer">
-        <!-- Approvals will be loaded here -->
-    </div>
+
 </div>
     <div class="projects-list">
         <h3>Current Projects</h3>
@@ -4008,7 +3798,6 @@ datalist {
                 </table>
             </div>
         </div>
-       
     </div>
     
 
@@ -4138,6 +3927,84 @@ datalist {
                     <!-- Projects will be loaded here -->
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+<div class="project-modal" id="createBudgetApprovalModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Request Budget Approval</h3>
+            <button class="close-btn" onclick="closeModal('createBudgetApprovalModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="budgetApprovalForm">
+                <input type="hidden" id="approvalActivityId">
+                <div class="form-group">
+                    <label for="approvalActivityName">Activity</label>
+                    <input type="text" id="approvalActivityName" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="approvalAmount">Amount (UGX)*</label>
+                    <input type="number" id="approvalAmount" required>
+                </div>
+                <div class="form-group">
+                    <label for="approvalComments">Comments</label>
+                    <textarea id="approvalComments" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="file-manager-btn secondary" onclick="closeModal('createBudgetApprovalModal')">Cancel</button>
+            <button class="file-manager-btn" onclick="submitBudgetApproval()">Submit Request</button>
+        </div>
+    </div>
+</div>
+<div class="project-modal" id="approveBudgetModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Review Budget Request</h3>
+            <button class="close-btn" onclick="closeModal('approveBudgetModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="approval-details">
+                <div class="detail-row">
+                    <span class="detail-label">Activity:</span>
+                    <span class="detail-value" id="reviewActivityName"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Requested By:</span>
+                    <span class="detail-value" id="reviewRequestedBy"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount:</span>
+                    <span class="detail-value" id="reviewAmount"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date Requested:</span>
+                    <span class="detail-value" id="reviewRequestDate"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Comments:</span>
+                    <span class="detail-value" id="reviewComments"></span>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="approvalDecision">Decision*</label>
+                <select id="approvalDecision" required>
+                    <option value="">Select decision</option>
+                    <option value="approved">Approve</option>
+                    <option value="rejected">Reject</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="approvalResponseComments">Response Comments</label>
+                <textarea id="approvalResponseComments" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="file-manager-btn secondary" onclick="closeModal('approveBudgetModal')">Cancel</button>
+            <button class="file-manager-btn" onclick="submitBudgetDecision()">Submit Decision</button>
         </div>
     </div>
 </div>
@@ -4998,13 +4865,20 @@ async function loadDonorProfiles(search = '') {
         const container = document.querySelector('.donor-cards');
         container.innerHTML = '<div class="loading">Loading donors...</div>';
         
-        const response = await fetch(`https://man-m681.onrender.com/donors/?search=${encodeURIComponent(search)}`);
+        // Fetch donors and their stats in parallel
+        const [donorsResponse, statsResponse] = await Promise.all([
+            fetch(`https://man-m681.onrender.com/donors/?search=${encodeURIComponent(search)}`),
+            fetch('https://man-m681.onrender.com/donors/stats/')
+        ]);
         
-        if (!response.ok) {
-            throw new Error('Failed to fetch donors');
+        if (!donorsResponse.ok || !statsResponse.ok) {
+            throw new Error('Failed to fetch donor data');
         }
         
-        const donors = await response.json();
+        const donors = await donorsResponse.json();
+        const statsData = await statsResponse.json();
+        const stats = statsData.donor_stats;
+        
         container.innerHTML = '';
         
         if (donors.length === 0) {
@@ -5012,7 +4886,16 @@ async function loadDonorProfiles(search = '') {
             return;
         }
         
+        // Create donor cards
         donors.forEach(donor => {
+            const donorStats = stats[donor.id] || {
+                name: donor.name,
+                donation_count: 0,
+                total_donated: 0,
+                first_donation: null,
+                last_donation: null
+            };
+            
             const donorCard = document.createElement('div');
             donorCard.className = 'donor-card';
             donorCard.innerHTML = `
@@ -5028,19 +4911,19 @@ async function loadDonorProfiles(search = '') {
                     <div class="donor-stats">
                         <div class="stat-item">
                             <span class="stat-label">Total Donations:</span>
-                            <span class="stat-value">UGX ${donor.stats.total_donated.toLocaleString()}</span>
+                            <span class="stat-value">UGX ${donorStats.total_donated.toLocaleString()}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Donation Count:</span>
-                            <span class="stat-value">${donor.stats.donation_count}</span>
+                            <span class="stat-value">${donorStats.donation_count}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">First Donation:</span>
-                            <span class="stat-value">${donor.stats.first_donation ? new Date(donor.stats.first_donation).toLocaleDateString() : '-'}</span>
+                            <span class="stat-value">${donorStats.first_donation || '-'}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Last Donation:</span>
-                            <span class="stat-value">${donor.stats.last_donation ? new Date(donor.stats.last_donation).toLocaleDateString() : '-'}</span>
+                            <span class="stat-value">${donorStats.last_donation || '-'}</span>
                         </div>
                     </div>
                 </div>
@@ -5064,41 +4947,30 @@ async function loadDonorProfiles(search = '') {
             `<p class="error">Failed to load donors: ${error.message}</p>`;
     }
 }
-        
-async function loadDonorData(donorId) {
+
+async function loadDonorStats() {
     try {
-        const response = await fetch(`https://man-m681.onrender.com/donors/${donorId}`);
+        const response = await fetch('https://man-m681.onrender.com/donors/stats/');
+        if (!response.ok) throw new Error('Failed to fetch donor stats');
         
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Failed to fetch donor data');
-        }
+        const data = await response.json();
+        const stats = data.donor_stats;
         
-        const donor = await response.json();
-        
-        // Populate form
-        document.getElementById('donorId').value = donor.id;
-        document.getElementById('donorProfileName').value = donor.name;
-        document.getElementById('donorEmail').value = donor.email || '';
-        document.getElementById('donorPhone').value = donor.phone || '';
-        document.getElementById('donorAddress').value = donor.address || '';
-        document.getElementById('donorType').value = donor.donor_type || 'individual';
-        document.getElementById('donorCategory').value = donor.category || 'one-time';
-        document.getElementById('donorNotes').value = donor.notes || '';
-        
-        // Update stats in the modal
-        document.getElementById('totalDonations').textContent = `UGX ${donor.stats.total_donated.toLocaleString()}`;
-        document.getElementById('donationCount').textContent = donor.stats.donation_count;
-        document.getElementById('firstDonation').textContent = donor.stats.first_donation ? 
-            new Date(donor.stats.first_donation).toLocaleDateString() : '-';
-        document.getElementById('lastDonation').textContent = donor.stats.last_donation ? 
-            new Date(donor.stats.last_donation).toLocaleDateString() : '-';
-        
-        // Load donation history
-        loadDonorDonations(donorId);
+        // Update each donor card with stats
+        document.querySelectorAll('.donor-card').forEach(card => {
+            const donorName = card.querySelector('.donor-name').textContent;
+            const statValueElements = card.querySelectorAll('.stat-value');
+            
+            // Find this donor in the stats
+            const donorId = Object.keys(stats).find(id => stats[id].name === donorName);
+            if (donorId) {
+                const donorStat = stats[donorId];
+                statValueElements[0].textContent = `UGX ${donorStat.total_donated.toLocaleString()}`;
+                statValueElements[1].textContent = donorStat.last_donation || '-';
+            }
+        });
     } catch (error) {
-        console.error('Error loading donor data:', error);
-        alert(`Failed to load donor data: ${error.message}`);
+        console.error('Error loading donor stats:', error);
     }
 }
         
@@ -5729,6 +5601,7 @@ function selectRole(role) {
     if (role === 'director') {
         document.getElementById('directorDashboard').style.display = 'block';
         loadProjects();
+        loadPendingApprovals(); 
         
         // Add event listener for create project button
         document.getElementById('createProjectBtn').addEventListener('click', function() {
@@ -5811,57 +5684,63 @@ function loadProjects() {
 }
 async function loadActivities() {
     try {
-        const response = await fetch('https://man-m681.onrender.com/activities/');
-        const activities = await response.json();
-        
         const tableBody = document.getElementById('activitiesTableBody');
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading activities...</td></tr>';
+        
+        const response = await fetch('https://man-m681.onrender.com/activities/');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Debug: Log the received data to see its structure
+        console.log('Received activities data:', data);
+        
+        // Handle both array response and object with activities property
+        const activities = Array.isArray(data) ? data : (data.activities || []);
+        
         tableBody.innerHTML = '';
         
-        for (const activity of activities) {
-            // Get budget status for each activity
-            const statusResponse = await fetch(`https://man-m681.onrender.com/activities/${activity.id}/budget-status/`);
-            const budgetStatus = await statusResponse.json();
-            
-            const statusBadge = {
-                'approved': 'status-badge approved',
-                'rejected': 'status-badge rejected',
-                'pending': 'status-badge pending',
-                'not_submitted': 'status-badge draft'
-            }[budgetStatus.status] || 'status-badge draft';
-            
-            const statusText = {
-                'approved': 'Approved',
-                'rejected': 'Rejected',
-                'pending': 'Pending Approval',
-                'not_submitted': 'Draft'
-            }[budgetStatus.status] || 'Draft';
-            
-            // Add Submit button only if status is draft/not_submitted
-            const submitButton = budgetStatus.status === 'not_submitted' ? 
-                `<button class="action-btn submit-btn" onclick="submitActivityBudget(${activity.id})">
-                    <i class="fas fa-paper-plane"></i> Submit
-                </button>` : '';
-            
+        if (activities.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No activities found</td></tr>';
+            return;
+        }
+        
+        activities.forEach(activity => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${activity.name}</td>
-                <td>${activity.project_name}</td>
-                <td>${activity.start_date}</td>
-                <td>${activity.end_date}</td>
-                <td>UGX ${activity.budget.toLocaleString()}</td>
-                <td><span class="${statusBadge}">${statusText}</span></td>
-                <td>
-                    ${submitButton}
-                    <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
-                        <i class="fas fa-coins"></i> Budget
-                    </button>
-                </td>
-            `;
+    <td>${activity.name || 'N/A'}</td>
+    <td>${activity.project_name || activity.project_id || 'N/A'}</td>
+    <td>${activity.start_date || 'N/A'}</td>
+    <td>${activity.end_date || 'N/A'}</td>
+    <td>UGX ${activity.budget ? activity.budget.toLocaleString() : '0'}</td>
+    <td><span class="status-badge ${activity.status ? activity.status.replace(' ', '_') : 'planned'}">
+        ${activity.status || 'Planned'}
+    </span></td>
+    <td>
+        <button class="action-btn view-btn" onclick="viewActivity(${activity.id})">
+            <i class="fas fa-eye"></i>
+        </button>
+        <button class="action-btn edit-btn" onclick="editActivity(${activity.id})">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
+            <i class="fas fa-coins"></i>
+        </button>
+        <button class="action-btn delete-btn" onclick="deleteActivity(${activity.id})">
+            <i class="fas fa-trash"></i>
+        </button>
+    </td>
+`;
             tableBody.appendChild(row);
-        }
+        });
+        
     } catch (error) {
         console.error('Error loading activities:', error);
-        document.getElementById('activitiesTableBody').innerHTML = `
+        const tableBody = document.getElementById('activitiesTableBody');
+        tableBody.innerHTML = `
             <tr>
                 <td colspan="7" style="text-align: center; color: red;">
                     Failed to load activities: ${error.message}
@@ -5870,7 +5749,6 @@ async function loadActivities() {
         `;
     }
 }
-        
 // Create a new activity
 async function createActivity() {
     const activityData = {
@@ -6619,7 +6497,509 @@ async function loadDashboardSummary() {
         // Don't show alert to avoid interrupting user experience
     }
 }
+        
+async function manageActivityBudget(activityId, activityName) {
+    // Create or show the budget management modal
+    if (!document.getElementById('budgetManagementModal')) {
+        createBudgetManagementModal();
+    }
+    
+    // Set the activity info
+    document.getElementById('budgetForActivityName').textContent = activityName;
+    document.getElementById('budgetManagementModal').dataset.activityId = activityId;
+    
+    // Load existing budget items
+    await loadActivityBudgetItems(activityId);
+    
+    // Show the modal
+    document.getElementById('budgetManagementModal').classList.add('show');
+}
 
+function createBudgetManagementModal() {
+    const modalHTML = `
+        <div class="project-modal" id="budgetManagementModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Budget Items for <span id="budgetForActivityName"></span></h3>
+                    <button class="close-btn" onclick="closeModal('budgetManagementModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="modern-table" id="budgetItemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                    <th>Category</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="budgetItemsTableBody">
+                                <!-- Budget items will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section-header" style="margin-top: 20px;">
+                        <h4>Add New Budget Item</h4>
+                    </div>
+                    <form id="newBudgetItemForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newItemName">Item Name*</label>
+                                <input type="text" id="newItemName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newItemDescription">Description</label>
+                                <input type="text" id="newItemDescription">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newItemQuantity">Quantity*</label>
+                                <input type="number" id="newItemQuantity" value="1" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newItemUnitPrice">Unit Price (UGX)*</label>
+                                <input type="number" id="newItemUnitPrice" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newItemCategory">Category*</label>
+                                <select id="newItemCategory" required>
+                                    <option value="materials">Materials</option>
+                                    <option value="labor">Labor</option>
+                                    <option value="transport">Transport</option>
+                                    <option value="equipment">Equipment</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="file-manager-btn secondary" onclick="closeModal('budgetManagementModal')">
+                        Close
+                    </button>
+                    <button class="file-manager-btn" onclick="addBudgetItem()">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+async function loadActivityBudgetItems(activityId) {
+    try {
+        const tbody = document.getElementById('budgetItemsTableBody');
+        tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading budget items...</td></tr>';
+        
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`);
+        if (!response.ok) throw new Error('Failed to fetch budget items');
+        
+        const budgetItems = await response.json();
+        tbody.innerHTML = '';
+        
+        if (budgetItems.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No budget items found</td></tr>';
+            return;
+        }
+        
+        let totalBudget = 0;
+        
+        budgetItems.forEach(item => {
+            totalBudget += item.total;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.item_name}</td>
+                <td>${item.description || '-'}</td>
+                <td>${item.quantity}</td>
+                <td>UGX ${item.unit_price.toLocaleString()}</td>
+                <td>UGX ${item.total.toLocaleString()}</td>
+                <td>${item.category}</td>
+                <td>
+                    <button class="action-btn delete-btn" onclick="deleteBudgetItem(${item.id}, ${activityId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // Add total row
+        const totalRow = document.createElement('tr');
+        totalRow.className = 'total-row';
+        totalRow.innerHTML = `
+            <td colspan="4" style="text-align: right;"><strong>Total Budget:</strong></td>
+            <td><strong>UGX ${totalBudget.toLocaleString()}</strong></td>
+            <td colspan="2"></td>
+        `;
+        tbody.appendChild(totalRow);
+        
+    } catch (error) {
+        console.error('Error loading budget items:', error);
+        document.getElementById('budgetItemsTableBody').innerHTML = 
+            '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load budget items</td></tr>';
+    }
+}
+
+async function addBudgetItem() {
+    const activityId = document.getElementById('budgetManagementModal').dataset.activityId;
+    const itemData = {
+        item_name: document.getElementById('newItemName').value.trim(),
+        description: document.getElementById('newItemDescription').value.trim(),
+        quantity: parseFloat(document.getElementById('newItemQuantity').value),
+        unit_price: parseFloat(document.getElementById('newItemUnitPrice').value),
+        category: document.getElementById('newItemCategory').value
+    };
+    
+    // Validate required fields
+    if (!itemData.item_name || isNaN(itemData.quantity) || isNaN(itemData.unit_price)) {
+        alert('Please fill in all required fields with valid values');
+        return;
+    }
+    
+    try {
+        const submitBtn = document.querySelector('#budgetManagementModal .modal-footer .file-manager-btn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch(`https://man-m681.onrender.com/activities/${activityId}/budget-items/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(itemData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to add budget item');
+        }
+        
+        // Refresh the budget items list
+        await loadActivityBudgetItems(activityId);
+        
+        // Clear the form
+        document.getElementById('newItemName').value = '';
+        document.getElementById('newItemDescription').value = '';
+        document.getElementById('newItemQuantity').value = '1';
+        document.getElementById('newItemUnitPrice').value = '';
+        
+    } catch (error) {
+        console.error('Error adding budget item:', error);
+        alert(`Failed to add budget item: ${error.message}`);
+    } finally {
+        const submitBtn = document.querySelector('#budgetManagementModal .modal-footer .file-manager-btn');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Item';
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+async function deleteBudgetItem(itemId, activityId) {
+    if (!confirm('Are you sure you want to delete this budget item?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/budget-items/${itemId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete budget item');
+        }
+        
+        // Refresh the budget items list
+        await loadActivityBudgetItems(activityId);
+        
+    } catch (error) {
+        console.error('Error deleting budget item:', error);
+        alert('Failed to delete budget item');
+    }
+}
+sync function loadProgramCards() {
+    try {
+        // Fetch data from your dashboard-summary endpoint
+        const response = await fetch('https://man-m681.onrender.com/dashboard-summary/');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch dashboard data');
+        }
+        
+        const data = await response.json();
+        
+        // Debug: Log the received data to inspect its structure
+        console.log('Dashboard data:', data);
+        
+        // Update the main account card
+        const mainAccountElement = document.querySelector('.main-bank-card .bank-card-balance');
+        if (mainAccountElement && data.main_account_balance !== undefined) {
+            mainAccountElement.textContent = `UGX ${data.main_account_balance.toLocaleString()}`;
+        }
+        
+        // Update program area cards
+        const programCards = {
+            'Women Empowerment': document.querySelector('.program-card-1 .bank-card-balance'),
+            'Vocational Education': document.querySelector('.program-card-2 .bank-card-balance'),
+            'Climate Change': document.querySelector('.program-card-3 .bank-card-balance'),
+            'Reproductive Health': document.querySelector('.program-card-4 .bank-card-balance')
+        };
+        
+        // Check if program_balances exists in the response
+        if (data.program_balances) {
+            for (const [programName, cardElement] of Object.entries(programCards)) {
+                if (cardElement && data.program_balances[programName] !== undefined) {
+                    cardElement.textContent = `UGX ${data.program_balances[programName].toLocaleString()}`;
+                }
+            }
+        }
+        
+        // Update quick stats if available
+        if (data.total_donations !== undefined) {
+            const donationStatElement = document.querySelector('.stat-card .stat-value');
+            if (donationStatElement) {
+                donationStatElement.textContent = `UGX ${data.total_donations.toLocaleString()}`;
+            }
+        }
+        
+        console.log('Program cards updated successfully');
+        
+    } catch (error) {
+        console.error('Error loading program cards:', error);
+        // You might want to show a user-friendly error message here
+    }
+}
+function requestBudgetApproval(activityId, activityName) {
+    document.getElementById('approvalActivityId').value = activityId;
+    document.getElementById('approvalActivityName').value = activityName;
+    document.getElementById('approvalAmount').value = '';
+    document.getElementById('approvalComments').value = '';
+    document.getElementById('createBudgetApprovalModal').classList.add('show');
+}
+
+// For Head of Programs - Submit budget approval request
+async function submitBudgetApproval() {
+    const activityId = document.getElementById('approvalActivityId').value;
+    const amount = parseFloat(document.getElementById('approvalAmount').value);
+    const comments = document.getElementById('approvalComments').value;
+    
+    if (!activityId || isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    try {
+        const response = await fetch('https://man-m681.onrender.com/budget-approvals/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Requested-By': 'Head of Programs' // This would normally be the logged in user
+            },
+            body: JSON.stringify({
+                activity_id: parseInt(activityId),
+                requested_amount: amount,
+                comments: comments
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to submit budget approval');
+        }
+        
+        const data = await response.json();
+        alert('Budget approval request submitted successfully!');
+        closeModal('createBudgetApprovalModal');
+        
+        // Refresh activities to show pending approval status
+        if (document.getElementById('programOfficerDashboard').style.display === 'block') {
+            loadActivities();
+        }
+    } catch (error) {
+        console.error('Error submitting budget approval:', error);
+        alert(`Failed to submit budget approval: ${error.message}`);
+    }
+}
+
+// For Director - Load pending approvals
+async function loadPendingApprovals() {
+    try {
+        const response = await fetch('https://man-m681.onrender.com/budget-approvals/?status=pending');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch pending approvals');
+        }
+        
+        const approvals = await response.json();
+        
+        // Here you would update your UI to show the pending approvals to the Director
+        // For example, you could add them to a table or list
+        console.log('Pending approvals:', approvals);
+        
+        // You might want to show a notification badge with the count
+        const approvalCount = approvals.length;
+        const approvalBadge = document.getElementById('approvalBadge');
+        if (approvalBadge) {
+            approvalBadge.textContent = approvalCount;
+            approvalBadge.style.display = approvalCount > 0 ? 'inline-block' : 'none';
+        }
+    } catch (error) {
+        console.error('Error loading pending approvals:', error);
+    }
+}
+
+// For Director - Open approval modal
+function openApprovalModal(approval) {
+    document.getElementById('reviewActivityName').textContent = approval.activity_name;
+    document.getElementById('reviewRequestedBy').textContent = approval.requested_by;
+    document.getElementById('reviewAmount').textContent = `UGX ${approval.requested_amount.toLocaleString()}`;
+    document.getElementById('reviewRequestDate').textContent = new Date(approval.created_at).toLocaleString();
+    document.getElementById('reviewComments').textContent = approval.comments || 'None';
+    document.getElementById('approvalDecision').value = '';
+    document.getElementById('approvalResponseComments').value = '';
+    
+    // Store the approval ID for submission
+    document.getElementById('approveBudgetModal').dataset.approvalId = approval.id;
+    
+    document.getElementById('approveBudgetModal').classList.add('show');
+}
+
+// For Director - Submit approval decision
+async function submitBudgetDecision() {
+    const approvalId = document.getElementById('approveBudgetModal').dataset.approvalId;
+    const decision = document.getElementById('approvalDecision').value;
+    const comments = document.getElementById('approvalResponseComments').value;
+    
+    if (!approvalId || !decision) {
+        alert('Please select a decision');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://man-m681.onrender.com/budget-approvals/${approvalId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status: decision,
+                approved_by: 'Director', // This would be the logged in user
+                comments: comments
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to submit decision');
+        }
+        
+        const data = await response.json();
+        alert(`Budget request ${decision} successfully!`);
+        closeModal('approveBudgetModal');
+        
+        // Refresh pending approvals list
+        loadPendingApprovals();
+        
+        // Update program cards to reflect new balances
+        loadProgramCards();
+    } catch (error) {
+        console.error('Error submitting budget decision:', error);
+        alert(`Failed to submit decision: ${error.message}`);
+    }
+}
+
+// Update the activity table to show approval status and add action buttons
+function updateActivityTableWithApprovalStatus(activities) {
+    const tableBody = document.getElementById('activitiesTableBody');
+    tableBody.innerHTML = '';
+    
+    activities.forEach(activity => {
+        const row = document.createElement('tr');
+        
+        // Check if this activity has a pending approval
+        const hasPendingApproval = activity.pending_approval || false;
+        
+        row.innerHTML = `
+            <td>${activity.name}</td>
+            <td>${activity.project_name}</td>
+            <td>${activity.start_date}</td>
+            <td>${activity.end_date}</td>
+            <td>UGX ${activity.budget.toLocaleString()}</td>
+            <td>
+                <span class="status-badge ${activity.status}">${activity.status}</span>
+                ${hasPendingApproval ? '<span class="status-badge pending" style="margin-left: 5px;">Pending Approval</span>' : ''}
+            </td>
+            <td>
+                <button class="action-btn view-btn" onclick="viewActivity(${activity.id})">
+                    <i class="fas fa-eye"></i>
+                </button>
+                ${!hasPendingApproval ? `
+                <button class="action-btn budget-btn" onclick="requestBudgetApproval(${activity.id}, '${activity.name}')">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </button>
+                ` : ''}
+                <button class="action-btn edit-btn" onclick="editActivity(${activity.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" onclick="deleteActivity(${activity.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+// Modify your loadActivities function to include approval status
+async function loadActivities() {
+    try {
+        const response = await fetch('https://man-m681.onrender.com/activities/');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const activities = Array.isArray(data) ? data : (data.activities || []);
+        
+        // For each activity, check if it has a pending approval
+        const activitiesWithApprovalStatus = await Promise.all(activities.map(async activity => {
+            try {
+                const approvalResponse = await fetch(`https://man-m681.onrender.com/budget-approvals/?activity_id=${activity.id}&status=pending`);
+                if (approvalResponse.ok) {
+                    const approvals = await approvalResponse.json();
+                    activity.pending_approval = approvals.length > 0;
+                }
+            } catch (e) {
+                console.error('Error checking approval status:', e);
+                activity.pending_approval = false;
+            }
+            return activity;
+        }));
+        
+        updateActivityTableWithApprovalStatus(activitiesWithApprovalStatus);
+        
+    } catch (error) {
+        console.error('Error loading activities:', error);
+        const tableBody = document.getElementById('activitiesTableBody');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: red;">
+                    Failed to load activities: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
     </script>
     <script src="sidebarToggle.js"></script>
     <script src="navNavigation.js"></script>
