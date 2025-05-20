@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentFolderId = folderId || 'root';
         fileManagerGrid.innerHTML = '<div class="loading">Loading contents...</div>';
         
-        fetch(`https://man-m681.onrender.com/folders/${currentFolderId}/contents`)
+        fetch(`https://backend-jz65.onrender.com/folders/${currentFolderId}/contents`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load folder contents');
@@ -309,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
         
-        xhr.open('POST', 'https://man-m681.onrender.com/upload/', true);
+        xhr.open('POST', 'https://backend-jz65.onrender.com/upload/', true);
         xhr.send(formData);
     }
     
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        fetch('https://man-m681.onrender.com/folders/', {
+        fetch('https://backend-jz65.onrender.com/folders/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // For images and PDFs, we can display them directly
         if (fileType.includes('image') || fileType.includes('pdf')) {
-            fetch(`https://man-m681.onrender.com/files/${fileId}/preview`, {
+            fetch(`https://backend-jz65.onrender.com/files/${fileId}/preview`, {
                 headers: {
                     'Accept': fileType
                 }
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function downloadFile(fileId, fileName) {
-        fetch(`https://man-m681.onrender.com/files/${fileId}/download`, {
+        fetch(`https://backend-jz65.onrender.com/files/${fileId}/download`, {
             headers: {
                 'Accept': 'application/octet-stream'
             }
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const newName = prompt('Enter new file name:', currentName);
         
         if (newName && newName !== currentName) {
-            fetch(`https://man-m681.onrender.com/files/${fileId}`, {
+            fetch(`https://backend-jz65.onrender.com/files/${fileId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -489,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function deleteFile(fileId, fileName) {
         if (confirm(`Are you sure you want to delete "${fileName}"?`)) {
-            fetch(`https://man-m681.onrender.com/files/${fileId}`, {
+            fetch(`https://backend-jz65.onrender.com/files/${fileId}`, {
                 method: 'DELETE'
             })
             .then(response => {
@@ -512,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const newName = prompt('Enter new folder name:', currentName);
         
         if (newName && newName !== currentName) {
-            fetch(`https://man-m681.onrender.com/folders/${folderId}`, {
+            fetch(`https://backend-jz65.onrender.com/folders/${folderId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function deleteFolder(folderId) {
         if (confirm('Are you sure you want to delete this folder and all its contents?')) {
-            fetch(`https://man-m681.onrender.com/folders/${folderId}`, {
+            fetch(`https://backend-jz65.onrender.com/folders/${folderId}`, {
                 method: 'DELETE'
             })
             .then(response => {
@@ -645,7 +645,7 @@ function previewFile(fileId, fileName, fileType) {
     
     // For images and PDFs, we can display them directly
     if (fileType.includes('image') || fileType.includes('pdf')) {
-        fetch(`https://man-m681.onrender.com/files/${fileId}/preview`, {
+        fetch(`https://backend-jz65.onrender.com/files/${fileId}/preview`, {
             headers: {
                 'Accept': fileType
             }
@@ -707,7 +707,7 @@ function closePreview() {
 }
 
 function downloadFile(fileId, fileName) {
-    fetch(`https://man-m681.onrender.com/files/${fileId}/download`, {
+    fetch(`https://backend-jz65.onrender.com/files/${fileId}/download`, {
         headers: {
             'Accept': 'application/octet-stream'
         }
@@ -744,7 +744,7 @@ function renameFile(fileId, currentName) {
     const newName = prompt('Enter new file name:', currentName);
     
     if (newName && newName !== currentName) {
-        fetch(`https://man-m681.onrender.com/files/${fileId}`, {
+        fetch(`https://backend-jz65.onrender.com/files/${fileId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -771,7 +771,7 @@ function renameFile(fileId, currentName) {
 
 function deleteFile(fileId, fileName) {
     if (confirm(`Are you sure you want to delete "${fileName}"?`)) {
-        fetch(`https://man-m681.onrender.com/files/${fileId}`, {
+        fetch(`https://backend-jz65.onrender.com/files/${fileId}`, {
             method: 'DELETE'
         })
         .then(response => {
@@ -794,7 +794,7 @@ function renameFolder(folderId, currentName) {
     const newName = prompt('Enter new folder name:', currentName);
     
     if (newName && newName !== currentName) {
-        fetch(`https://man-m681.onrender.com/folders/${folderId}`, {
+        fetch(`https://backend-jz65.onrender.com/folders/${folderId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -821,7 +821,7 @@ function renameFolder(folderId, currentName) {
 
 function deleteFolder(folderId) {
     if (confirm('Are you sure you want to delete this folder and all its contents?')) {
-        fetch(`https://man-m681.onrender.com/folders/${folderId}`, {
+        fetch(`https://backend-jz65.onrender.com/folders/${folderId}`, {
             method: 'DELETE'
         })
         .then(response => {
@@ -854,7 +854,7 @@ function createNewFolder() {
         return;
     }
     
-    fetch('https://man-m681.onrender.com/folders/', {
+    fetch('https://backend-jz65.onrender.com/folders/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
