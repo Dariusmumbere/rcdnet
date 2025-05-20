@@ -30,7 +30,7 @@ async function previewFile(fileId, fileName, fileType) {
         document.getElementById('filePreviewModal').classList.add('show');
         
         // Get file preview from server
-        const response = await fetch(`https://man-m681.onrender.com/files/${fileId}/preview`);
+        const response = await fetch(`https://backend-jz65.onrender.com/files/${fileId}/preview`);
         
         if (!response.ok) {
             throw new Error('Failed to get file preview');
@@ -71,7 +71,7 @@ async function downloadFile(fileId, fileName) {
         document.querySelectorAll('.file-actions-dropdown.show').forEach(d => d.classList.remove('show'));
         
         // Create a temporary link and trigger download
-        const response = await fetch(`https://man-m681.onrender.com/files/${fileId}/download`);
+        const response = await fetch(`https://backend-jz65.onrender.com/files/${fileId}/download`);
         
         if (!response.ok) {
             throw new Error('Failed to download file');
@@ -102,7 +102,7 @@ async function renameFile(fileId, currentName) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/files/${fileId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/files/${fileId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ async function deleteFile(fileId, fileName) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/files/${fileId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/files/${fileId}`, {
             method: 'DELETE'
         });
         
@@ -162,7 +162,7 @@ async function renameFolder(folderId, currentName) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/folders/${folderId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/folders/${folderId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ async function deleteFolder(folderId) {
     }
     
     try {
-        const response = await fetch(`https://man-m681.onrender.com/folders/${folderId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/folders/${folderId}`, {
             method: 'DELETE'
         });
         
@@ -254,7 +254,7 @@ async function createNewFolder() {
             requestData.parent_id = currentFolderId;
         }
         
-        const response = await fetch('https://man-m681.onrender.com/folders/', {
+        const response = await fetch('https://backend-jz65.onrender.com/folders/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -351,8 +351,8 @@ async function loadFolderContents(folderId = null) {
         fileManagerGrid.innerHTML = '<div class="loading">Loading folder contents...</div>';
         
         const url = folderId ? 
-            `https://man-m681.onrender.com/folders/${folderId}/contents` :
-            'https://man-m681.onrender.com/folders/root/contents';
+            `https://backend-jz65.onrender.com/folders/${folderId}/contents` :
+            'https://backend-jz65.onrender.com/folders/root/contents';
             
         const response = await fetch(url);
         
@@ -455,7 +455,7 @@ async function updateBreadcrumb(folderId = null) {
     
     try {
         // Get folder path
-        const response = await fetch(`https://man-m681.onrender.com/folders/${folderId}/path`);
+        const response = await fetch(`https://backend-jz65.onrender.com/folders/${folderId}/path`);
         
         if (!response.ok) {
             throw new Error('Failed to get folder path');
@@ -537,7 +537,7 @@ document.getElementById('startUploadBtn').addEventListener('click', async functi
             formData.append('folder_id', currentFolderId);
         }
         
-        const response = await fetch('https://man-m681.onrender.com/upload/', {
+        const response = await fetch('https://backend-jz65.onrender.com/upload/', {
             method: 'POST',
             body: formData
         });
@@ -686,7 +686,7 @@ document.getElementById('startUploadBtn').addEventListener('click', async functi
             formData.append('folder_id', currentFolderId);
         }
         
-        const response = await fetch('https://man-m681.onrender.com/upload/', {
+        const response = await fetch('https://backend-jz65.onrender.com/upload/', {
             method: 'POST',
             body: formData
         });
