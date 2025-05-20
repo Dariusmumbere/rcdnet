@@ -4252,8 +4252,8 @@
         submitBtn.disabled = true;
 
         const url = isEdit 
-            ? `https://backend-fbxv.onrender.com/donations/${donationId}`
-            : 'https://backend-fbxv.onrender.com/donations/';
+            ? `https://backend-jz65.onrender.com/donations/${donationId}`
+            : 'https://backend-jz65.onrender.com/donations/';
             
         const method = isEdit ? 'PUT' : 'POST';
 
@@ -4440,7 +4440,7 @@ async function loadDonations() {
         const donationsTable = document.querySelector('.donations-table tbody');
         donationsTable.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading donations...</td></tr>';
         
-        const response = await fetch('https://backend-fbxv.onrender.com/donations/');
+        const response = await fetch('https://backend-jz65.onrender.com/donations/');
         
         if (!response.ok) {
             throw new Error('Failed to fetch donations');
@@ -4511,7 +4511,7 @@ async function editDonation(donationId) {
 async function deleteDonation(donationId) {
     if (confirm('Are you sure you want to delete this donation record?')) {
         try {
-            const response = await fetch(`https://backend-fbxv.onrender.com/donations/${donationId}`, {
+            const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`, {
                 method: 'DELETE'
             });
             
@@ -4560,7 +4560,7 @@ function setupTabSwitching() {
 }
 async function loadReceipts() {
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/donations/');
+        const response = await fetch('https://backend-jz65.onrender.com/donations/');
         if (!response.ok) throw new Error('Failed to fetch donations');
         
         const donations = await response.json();
@@ -4667,7 +4667,7 @@ function closeDonorModal() {
 // Function to load donor data
 async function loadDonorData(donorId) {
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/donors/${donorId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`);
         
         if (!response.ok) {
             const error = await response.json();
@@ -4697,7 +4697,7 @@ async function loadDonorData(donorId) {
 // Function to load donor's donations
 async function loadDonorDonations(donorId) {
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/donors/${donorId}/donations`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}/donations`);
         if (!response.ok) throw new Error('Failed to fetch donor donations');
         
         const data = await response.json();
@@ -4759,8 +4759,8 @@ async function saveDonor() {
     try {
         const isEdit = !!currentDonorId;
         const url = isEdit 
-            ? `https://backend-fbxv.onrender.com/donors/${currentDonorId}`
-            : 'https://backend-fbxv.onrender.com/donors/';
+            ? `https://backend-jz65.onrender.com/donors/${currentDonorId}`
+            : 'https://backend-jz65.onrender.com/donors/';
         const method = isEdit ? 'PUT' : 'POST';
         
         // Show loading state
@@ -4865,8 +4865,8 @@ async function loadDonorProfiles(search = '') {
         
         // Fetch donors and their stats in parallel
         const [donorsResponse, statsResponse] = await Promise.all([
-            fetch(`https://backend-fbxv.onrender.com/donors/?search=${encodeURIComponent(search)}`),
-            fetch('https://backend-fbxv.onrender.com/donors/stats/')
+            fetch(`https://backend-jz65.onrender.com/donors/?search=${encodeURIComponent(search)}`),
+            fetch('https://backend-jz65.onrender.com/donors/stats/')
         ]);
         
         if (!donorsResponse.ok || !statsResponse.ok) {
@@ -4948,7 +4948,7 @@ async function loadDonorProfiles(search = '') {
 
 async function loadDonorStats() {
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/donors/stats/');
+        const response = await fetch('https://backend-jz65.onrender.com/donors/stats/');
         if (!response.ok) throw new Error('Failed to fetch donor stats');
         
         const data = await response.json();
@@ -4979,7 +4979,7 @@ async function deleteDonor(donorId) {
     }
     
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/donors/${donorId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`, {
             method: 'DELETE'
         });
         
@@ -5006,7 +5006,7 @@ async function deleteDonor(donorId) {
     }
     
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/donors/${donorId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/donors/${donorId}`, {
             method: 'DELETE'
         });
         
@@ -5106,7 +5106,7 @@ window.downloadDonationHistory = downloadDonationHistory;
         
         async function populateDonorDropdown() {
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/donors/');
+        const response = await fetch('https://backend-jz65.onrender.com/donors/');
         if (!response.ok) throw new Error('Failed to fetch donors');
         
         const donors = await response.json();
@@ -5142,8 +5142,8 @@ document.getElementById('addDonationBtn').addEventListener('click', function() {
 async function loadDonationHistory(donorId) {
     try {
         const [donorResponse, historyResponse] = await Promise.all([
-            fetch(`https://backend-fbxv.onrender.com/donors/${donorId}`),
-            fetch(`https://backend-fbxv.onrender.com/donors/${donorId}/donations`)
+            fetch(`https://backend-jz65.onrender.com/donors/${donorId}`),
+            fetch(`https://backend-jz65.onrender.com/donors/${donorId}/donations`)
         ]);
 
         if (!donorResponse.ok || !historyResponse.ok) {
@@ -5415,7 +5415,7 @@ document.getElementById('downloadHistoryBtn').addEventListener('click', function
 });
         async function viewDonation(donationId) {
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/donations/${donationId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`);
         if (!response.ok) throw new Error('Failed to fetch donation');
         
         const donation = await response.json();
@@ -5487,7 +5487,7 @@ async function editDonation(donationId) {
         // Close any open modals
         closeModal('viewDonationModal');
         
-        const response = await fetch(`https://backend-fbxv.onrender.com/donations/${donationId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`);
         if (!response.ok) throw new Error('Failed to fetch donation');
         
         const donation = await response.json();
@@ -5521,7 +5521,7 @@ async function deleteDonation(donationId) {
     }
     
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/donations/${donationId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/donations/${donationId}`, {
             method: 'DELETE'
         });
         
@@ -5632,7 +5632,7 @@ function selectRole(role) {
 }
 async function loadProjectsForActivities() {
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/projects/');
+        const response = await fetch('https://backend-jz65.onrender.com/projects/');
         if (!response.ok) throw new Error('Failed to fetch projects');
         
         const data = await response.json();
@@ -5652,7 +5652,7 @@ async function loadProjectsForActivities() {
 }
 // Project Management Functions
 function loadProjects() {
-    fetch('https://backend-fbxv.onrender.com/projects/')
+    fetch('https://backend-jz65.onrender.com/projects/')
         .then(response => response.json())
         .then(data => {
             const tableBody = document.getElementById('projectsTableBody');
@@ -5685,7 +5685,7 @@ async function loadActivities() {
         const tableBody = document.getElementById('activitiesTableBody');
         tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading activities...</td></tr>';
         
-        const response = await fetch('https://backend-fbxv.onrender.com/activities/');
+        const response = await fetch('https://backend-jz65.onrender.com/activities/');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -5772,7 +5772,7 @@ async function createActivity() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         submitBtn.disabled = true;
         
-        const response = await fetch('https://backend-fbxv.onrender.com/activities/', {
+        const response = await fetch('https://backend-jz65.onrender.com/activities/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -5853,7 +5853,7 @@ async function createBudgetItem() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         submitBtn.disabled = true;
         
-        const response = await fetch(`https://backend-fbxv.onrender.com/activities/${activityId}/budget-items/`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -5884,7 +5884,7 @@ async function createBudgetItem() {
 // View activity details
 async function viewActivity(activityId) {
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/activities/${activityId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`);
         if (!response.ok) throw new Error('Failed to fetch activity');
         
         const activity = await response.json();
@@ -5899,7 +5899,7 @@ async function viewActivity(activityId) {
 // Edit activity
 async function editActivity(activityId) {
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/activities/${activityId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`);
         if (!response.ok) throw new Error('Failed to fetch activity');
         
         const activity = await response.json();
@@ -5938,7 +5938,7 @@ async function deleteActivity(activityId) {
     }
     
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/activities/${activityId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}`, {
             method: 'DELETE'
         });
         
@@ -5973,10 +5973,10 @@ async function createProject() {
     
     // Determine if this is for a specific program area
     const programAreaId = document.getElementById('createProjectModal').dataset.programAreaId;
-    let url = 'https://backend-fbxv.onrender.com/projects/';
+    let url = 'https://backend-jz65.onrender.com/projects/';
     
     if (programAreaId) {
-        url = `https://backend-fbxv.onrender.com/program_areas/${programAreaId}/projects/`;
+        url = `https://backend-jz65.onrender.com/program_areas/${programAreaId}/projects/`;
     }
     
     try {
@@ -6020,7 +6020,7 @@ async function createProject() {
 }
 
 function viewProject(projectId) {
-    fetch(`https://backend-fbxv.onrender.com/projects/${projectId}`)
+    fetch(`https://backend-jz65.onrender.com/projects/${projectId}`)
         .then(response => response.json())
         .then(project => {
             alert(`Project Details:\nName: ${project.name}\nBudget: UGX ${project.budget}\nStatus: ${project.status}`);
@@ -6038,7 +6038,7 @@ function editProject(projectId) {
 
 function deleteProject(projectId) {
     if (confirm('Are you sure you want to delete this project?')) {
-        fetch(`https://backend-fbxv.onrender.com/projects/${projectId}`, {
+        fetch(`https://backend-jz65.onrender.com/projects/${projectId}`, {
             method: 'DELETE'
         })
         .then(response => {
@@ -6111,7 +6111,7 @@ async function loadProgramAreaProjects(programAreaId) {
         const tableBody = document.getElementById('programAreaProjectsTableBody');
         tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading projects...</td></tr>';
         
-        const response = await fetch(`https://backend-fbxv.onrender.com/program_areas/${programAreaId}/projects/`);
+        const response = await fetch(`https://backend-jz65.onrender.com/program_areas/${programAreaId}/projects/`);
         
         if (!response.ok) {
             throw new Error('Failed to fetch projects');
@@ -6209,10 +6209,10 @@ async function loadPendingPayments() {
         tbody.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr>';
         
         const statusFilter = document.getElementById('approvalStatusFilter').value;
-        let url = 'https://backend-fbxv.onrender.com/payments/';
+        let url = 'https://backend-jz65.onrender.com/payments/';
         
         if (statusFilter !== 'all') {
-            url = `https://backend-fbxv.onrender.com/payments/?status=${statusFilter}`;
+            url = `https://backend-jz65.onrender.com/payments/?status=${statusFilter}`;
         }
         
         const response = await fetch(url);
@@ -6258,7 +6258,7 @@ async function loadPendingPayments() {
 
 async function openApprovalModal(paymentId) {
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/payments/${paymentId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/payments/${paymentId}`);
         if (!response.ok) throw new Error('Failed to fetch payment details');
         
         const payment = await response.json();
@@ -6294,7 +6294,7 @@ async function approvePayment(approve) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         btn.disabled = true;
         
-        const response = await fetch('https://backend-fbxv.onrender.com/payments/approve', {
+        const response = await fetch('https://backend-jz65.onrender.com/payments/approve', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -6339,7 +6339,7 @@ async function approvePayment(approve) {
 // Common function to view payment details
 async function viewPaymentDetails(paymentId) {
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/payments/${paymentId}`);
+        const response = await fetch(`https://backend-jz65.onrender.com/payments/${paymentId}`);
         if (!response.ok) throw new Error('Failed to fetch payment details');
         
         const payment = await response.json();
@@ -6427,7 +6427,7 @@ async function processPayment(paymentId) {
     }
     
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/payments/process/${paymentId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/payments/process/${paymentId}`, {
             method: 'POST'
         });
         
@@ -6455,7 +6455,7 @@ async function processPayment(paymentId) {
 // Function to load dashboard summary
 async function loadDashboardSummary() {
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/dashboard-summary/');
+        const response = await fetch('https://backend-jz65.onrender.com/dashboard-summary/');
         if (!response.ok) throw new Error('Failed to fetch dashboard summary');
         
         const data = await response.json();
@@ -6597,7 +6597,7 @@ async function loadActivityBudgetItems(activityId) {
         const tbody = document.getElementById('budgetItemsTableBody');
         tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading budget items...</td></tr>';
         
-        const response = await fetch(`https://backend-fbxv.onrender.com/activities/${activityId}/budget-items/`);
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`);
         if (!response.ok) throw new Error('Failed to fetch budget items');
         
         const budgetItems = await response.json();
@@ -6668,7 +6668,7 @@ async function addBudgetItem() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
         submitBtn.disabled = true;
         
-        const response = await fetch(`https://backend-fbxv.onrender.com/activities/${activityId}/budget-items/`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/activities/${activityId}/budget-items/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -6708,7 +6708,7 @@ async function deleteBudgetItem(itemId, activityId) {
     }
     
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/budget-items/${itemId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/budget-items/${itemId}`, {
             method: 'DELETE'
         });
         
@@ -6727,7 +6727,7 @@ async function deleteBudgetItem(itemId, activityId) {
 sync function loadProgramCards() {
     try {
         // Fetch data from your dashboard-summary endpoint
-        const response = await fetch('https://backend-fbxv.onrender.com/dashboard-summary/');
+        const response = await fetch('https://backend-jz65.onrender.com/dashboard-summary/');
         
         if (!response.ok) {
             throw new Error('Failed to fetch dashboard data');
@@ -6796,7 +6796,7 @@ async function submitBudgetApproval() {
     }
     
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/budget-approvals/', {
+        const response = await fetch('https://backend-jz65.onrender.com/budget-approvals/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -6831,7 +6831,7 @@ async function submitBudgetApproval() {
 // For Director - Load pending approvals
 async function loadPendingApprovals() {
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/budget-approvals/?status=pending');
+        const response = await fetch('https://backend-jz65.onrender.com/budget-approvals/?status=pending');
         
         if (!response.ok) {
             throw new Error('Failed to fetch pending approvals');
@@ -6883,7 +6883,7 @@ async function submitBudgetDecision() {
     }
     
     try {
-        const response = await fetch(`https://backend-fbxv.onrender.com/budget-approvals/${approvalId}`, {
+        const response = await fetch(`https://backend-jz65.onrender.com/budget-approvals/${approvalId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -6960,7 +6960,7 @@ function updateActivityTableWithApprovalStatus(activities) {
 // Modify your loadActivities function to include approval status
 async function loadActivities() {
     try {
-        const response = await fetch('https://backend-fbxv.onrender.com/activities/');
+        const response = await fetch('https://backend-jz65.onrender.com/activities/');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -6972,7 +6972,7 @@ async function loadActivities() {
         // For each activity, check if it has a pending approval
         const activitiesWithApprovalStatus = await Promise.all(activities.map(async activity => {
             try {
-                const approvalResponse = await fetch(`https://backend-fbxv.onrender.com/budget-approvals/?activity_id=${activity.id}&status=pending`);
+                const approvalResponse = await fetch(`https://backend-jz65.onrender.com/budget-approvals/?activity_id=${activity.id}&status=pending`);
                 if (approvalResponse.ok) {
                     const approvals = await approvalResponse.json();
                     activity.pending_approval = approvals.length > 0;
