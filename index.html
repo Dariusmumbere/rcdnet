@@ -3773,6 +3773,17 @@ input[list] {
     </div>
 
 </div>
+    <div class="approvals-section">
+    <h2 class="section-title">
+        <i class="fas fa-clipboard-check"></i> Pending Approvals
+        <button class="file-manager-btn secondary" onclick="loadPendingApprovals()">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </h2>
+    <div id="approvalsContainer" class="approvals-grid">
+        <!-- Approvals will be loaded here -->
+    </div>
+</div>
     <div class="projects-list">
         <h3>Current Projects</h3>
         <div class="table-responsive">
