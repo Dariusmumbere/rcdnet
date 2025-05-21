@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setActiveNavItem(document.querySelector('#dashboardLink'));
     contentSections.dashboard.style.display = 'block';
     loadProgramCards();
+    loadPendingApprovals()
     
     // Handle navigation clicks
     sidebarMenu.addEventListener('click', function(e) {
