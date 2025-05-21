@@ -787,7 +787,7 @@ async function reviewActivityApproval(approvalId, decision) {
 // Function to load pending approvals (for Director)
 async function loadPendingApprovals() {
     try {
-        const response = await fetch('https://backend-jz65.onrender.com/activities/{activity_id}/request-approval');
+        const response = await fetch('https://backend-jz65.onrender.com/activity-approvals/?status=pending');
         if (!response.ok) throw new Error('Failed to fetch pending approvals');
         
         const approvals = await response.json();
