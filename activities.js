@@ -133,64 +133,54 @@ function showBudgetCreationModal(activityId, activityName) {
 // Function to load activities list
 async function loadActivities() {
     try {
-        const tableBody = document.getElementById('activitiesTableBody');
-        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading activities...</td></tr>';
-        
         const response = await fetch('https://backend-jz65.onrender.com/activities/');
+        if (!response.ok) throw new Error('Failed to fetch activities');
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const activities = Array.isArray(data) ? data : (data.activities || []);
-        
+        const activities = await response.json();
+        const tableBody = document.getElementById('activitiesTableBody');
         tableBody.innerHTML = '';
-        
-        if (activities.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No activities found</td></tr>';
-            return;
-        }
         
         activities.forEach(activity => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${activity.name || 'N/A'}</td>
-                <td>${activity.project_name || activity.project_id || 'N/A'}</td>
-                <td>${activity.start_date || 'N/A'}</td>
-                <td>${activity.end_date || 'N/A'}</td>
-                <td>UGX ${activity.budget ? activity.budget.toLocaleString() : '0'}</td>
-                <td><span class="status-badge ${activity.status ? activity.status.replace(' ', '_') : 'planned'}">
-                    ${activity.status || 'Planned'}
-                </span></td>
+                <td>${activity.name}</td>
+                <td>${activity.project_name}</td>
+                <td>${activity.start_date}</td>
+                <td>${activity.end_date}</td>
+                <td>UGX ${activity.budget.toLocaleString()}</td>
+                <td>
+                    <span class="status-badge ${activity.status}">${activity.status}</span>
+                    ${activity.status === 'pending' ? '<span class="status-badge pending">Pending Approval</span>' : ''}
+                </td>
                 <td>
                     <button class="action-btn view-btn" onclick="viewActivity(${activity.id})">
                         <i class="fas fa-eye"></i>
                     </button>
+                    ${activity.status === 'pending' ? `
                     <button class="action-btn edit-btn" onclick="editActivity(${activity.id})">
                         <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
-                        <i class="fas fa-coins"></i>
                     </button>
                     <button class="action-btn delete-btn" onclick="deleteActivity(${activity.id})">
                         <i class="fas fa-trash"></i>
                     </button>
+                    ` : `
+                    <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
+                        <i class="fas fa-coins"></i>
+                    </button>
+                    `}
+                    ${activity.status === 'pending' && currentRole === 'program_officer' ? `
+                    <button class="action-btn request-btn" onclick="requestActivityApproval(${activity.id}, '${activity.name}')">
+                        <i class="fas fa-paper-plane"></i> Request Approval
+                    </button>
+                    ` : ''}
                 </td>
             `;
             tableBody.appendChild(row);
         });
-        
     } catch (error) {
         console.error('Error loading activities:', error);
-        const tableBody = document.getElementById('activitiesTableBody');
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" style="text-align: center; color: red;">
-                    Failed to load activities: ${error.message}
-                </td>
-            </tr>
-        `;
+        document.getElementById('activitiesTableBody').innerHTML = 
+            '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load activities</td></tr>';
     }
 }
 
@@ -716,5 +706,115 @@ async function submitForApproval(activityId) {
     } catch (error) {
         console.error('Error submitting for approval:', error);
         alert(`Error: ${error.message}`);
+    }
+}
+async function requestActivityApproval(activityId, activityName) {
+    const amount = parseFloat(prompt(`Enter the budget amount you're requesting for "${activityName}":`));
+    if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    const comments = prompt('Enter any comments for the Director:') || '';
+    
+    try {
+        const response = await fetch('https://backend-jz65.onrender.com/activity-approvals/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                activity_id: activityId,
+                requested_by: 'Head of Programs', // Replace with actual user
+                requested_amount: amount,
+                comments: comments
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to submit approval request');
+        }
+        
+        const data = await response.json();
+        alert('Approval request submitted successfully!');
+        loadActivities(); // Refresh the activities list
+    } catch (error) {
+        console.error('Error requesting approval:', error);
+        alert('Failed to submit approval request. Please try again.');
+    }
+}
+
+// Function to approve/reject an activity (for Director)
+async function reviewActivityApproval(approvalId, decision) {
+    const responseComments = prompt(`Enter your comments for ${decision === 'approved' ? 'approval' : 'rejection'}:`) || '';
+    
+    try {
+        const response = await fetch(`https://backend-jz65.onrender.com/activity-approvals/${approvalId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                decision: decision,
+                approved_by: 'Director', // Replace with actual user
+                response_comments: responseComments
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to submit decision');
+        }
+        
+        const data = await response.json();
+        alert(`Activity ${decision} successfully!`);
+        loadPendingApprovals(); // Refresh the approvals list
+    } catch (error) {
+        console.error('Error reviewing approval:', error);
+        alert('Failed to submit decision. Please try again.');
+    }
+}
+
+// Function to load pending approvals (for Director)
+async function loadPendingApprovals() {
+    try {
+        const response = await fetch('https://backend-jz65.onrender.com/activity-approvals/?status=pending');
+        if (!response.ok) throw new Error('Failed to fetch pending approvals');
+        
+        const approvals = await response.json();
+        const container = document.getElementById('approvalsContainer');
+        
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (approvals.length === 0) {
+            container.innerHTML = '<p>No pending approvals</p>';
+            return;
+        }
+        
+        approvals.forEach(approval => {
+            const card = document.createElement('div');
+            card.className = 'approval-card';
+            card.innerHTML = `
+                <h3>${approval.activity_name}</h3>
+                <p><strong>Requested By:</strong> ${approval.requested_by}</p>
+                <p><strong>Amount:</strong> UGX ${approval.requested_amount.toLocaleString()}</p>
+                <p><strong>Comments:</strong> ${approval.comments || 'None'}</p>
+                <p><strong>Requested On:</strong> ${new Date(approval.created_at).toLocaleString()}</p>
+                <div class="approval-actions">
+                    <button class="file-manager-btn" onclick="reviewActivityApproval(${approval.id}, 'approved')">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="file-manager-btn secondary" onclick="reviewActivityApproval(${approval.id}, 'rejected')">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Error loading approvals:', error);
+        document.getElementById('approvalsContainer').innerHTML = 
+            '<p class="error">Failed to load approvals</p>';
     }
 }
