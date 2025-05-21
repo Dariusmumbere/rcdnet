@@ -1,4 +1,14 @@
 // Function to handle the "Create New Activity" button click
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're on the director dashboard
+    if (document.getElementById('directorDashboard')) {
+        loadPendingApprovals();
+        
+        // Also load program cards and projects
+        loadProgramCards();
+        loadProjectsForDirector();
+    }
+});
 function setupCreateActivityButton() {
     const createActivityBtn = document.getElementById('createActivityBtn');
     
