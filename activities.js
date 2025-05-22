@@ -786,7 +786,11 @@ async function reviewActivityApproval(approvalId, decision) {
         
         const data = await response.json();
         alert(`Activity ${decision} successfully!`);
-        loadPendingApprovals(); // Refresh the approvals list
+        
+        // Refresh the approvals list and program cards
+        loadPendingApprovals();
+        loadProgramCards();
+        
     } catch (error) {
         console.error('Error reviewing approval:', error);
         alert('Failed to submit decision. Please try again.');
