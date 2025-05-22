@@ -3,41 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activity Budget Viewer | RCDNET</title>
+    <title>Finance Dashboard | RCDNET</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --success-color: #2ecc71;
-            --warning-color: #f39c12;
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 80px;
-            --header-height: 70px;
-            --transition-speed: 0.3s;
+            --primary: #4361ee;
+            --primary-light: #eef2ff;
+            --secondary: #3f37c9;
+            --accent: #f72585;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #ef233c;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --sidebar-width: 280px;
+            --header-height: 80px;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            background-color: #f5f7fa;
-            color: #333;
-            overflow-x: hidden;
+            background-color: #f5f7ff;
+            color: var(--dark);
+            line-height: 1.6;
         }
 
-        /* Modern Header Styles */
+        /* Header Styles */
         .header {
             background-color: white;
             height: var(--header-height);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             position: fixed;
             top: 0;
             left: 0;
@@ -45,7 +51,7 @@
             z-index: 100;
             display: flex;
             align-items: center;
-            padding: 0 30px;
+            padding: 0 40px;
         }
 
         .header-content {
@@ -58,56 +64,66 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .logo-icon {
-            color: var(--primary-color);
-            font-size: 1.8rem;
+            color: var(--primary);
+            font-size: 2rem;
         }
 
         .logo-text {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--dark-color);
+            color: var(--dark);
             letter-spacing: -0.5px;
         }
 
         .logo-subtext {
-            font-size: 0.9rem;
-            color: #777;
+            font-size: 0.85rem;
+            color: var(--gray);
             font-weight: 400;
-            margin-left: 5px;
+            margin-left: 8px;
+            opacity: 0.8;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             cursor: pointer;
+            position: relative;
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
-            background-color: var(--light-color);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--dark-color);
+            color: white;
             font-weight: 600;
+            font-size: 1.1rem;
         }
 
         .user-name {
             font-weight: 600;
-            color: var(--dark-color);
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 2px;
         }
 
         .container {
@@ -119,150 +135,212 @@
         /* Main Content Styles */
         .main-content {
             flex: 1;
-            padding: 30px;
+            padding: 30px 40px;
+            background-color: #f5f7ff;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
 
         .page-title {
             font-size: 1.8rem;
-            color: var(--dark-color);
-            margin-bottom: 20px;
+            font-weight: 700;
+            color: var(--dark);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        /* Activity Selection Section */
-        .selection-section {
+        .page-title i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Card Styles */
+        .card {
             background-color: white;
-            border-radius: 10px;
+            border-radius: var(--border-radius);
             padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--box-shadow);
             margin-bottom: 30px;
+            transition: var(--transition);
         }
 
-        .form-group {
-            margin-bottom: 20px;
+        .card:hover {
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            background-color: white;
-        }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn:hover {
-            background-color: var(--secondary-color);
-        }
-
-        /* Budget Section */
-        .budget-section {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .section-header {
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-light);
         }
 
-        .section-title {
+        .card-title {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--dark-color);
+            color: var(--dark);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: white;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-icon {
+            font-size: 1rem;
         }
 
         /* Budget Table Styles */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
         }
 
         .budget-table {
             width: 100%;
-            border-collapse: collapse;
-        }
-
-        .budget-table th, 
-        .budget-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #f0f0f0;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         .budget-table th {
-            background-color: #f8f9fa;
+            background-color: #f8f9ff;
             font-weight: 600;
-            color: #555;
+            color: var(--dark);
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 0.5px;
+            padding: 15px;
+            text-align: left;
+            position: sticky;
+            top: 0;
         }
 
-        .budget-table tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .budget-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+            font-size: 0.95rem;
         }
 
-        .budget-table tr:hover {
-            background-color: rgba(52, 152, 219, 0.05);
+        .budget-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .budget-table tr:hover td {
+            background-color: var(--primary-light);
         }
 
         .budget-total {
-            font-weight: bold;
+            font-weight: 700;
             text-align: right;
             padding: 15px;
-            background-color: #f8f9fa;
-            border-top: 2px solid #ddd;
-            margin-top: 10px;
+            background-color: #f8f9ff;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            margin-top: -10px;
             font-size: 1.1rem;
+            color: var(--dark);
         }
 
         /* Activity Info */
         .activity-info {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            background-color: #f8f9ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
         }
 
         .activity-info-item {
-            margin-bottom: 10px;
             display: flex;
+            flex-direction: column;
         }
 
         .activity-info-label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .activity-info-value {
             font-weight: 600;
-            min-width: 120px;
-            color: #555;
+            font-size: 1rem;
+            color: var(--dark);
         }
 
         /* Status badges */
@@ -271,46 +349,62 @@
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             min-width: 80px;
-            text-align: center;
+            justify-content: center;
             text-transform: capitalize;
         }
 
-        .status-badge.active {
-            background-color: rgba(46, 204, 113, 0.1);
-            color: #27ae60;
-            border: 1px solid rgba(46, 204, 113, 0.2);
+        .status-badge i {
+            font-size: 0.65rem;
         }
 
-        .status-badge.planned {
-            background-color: rgba(243, 156, 18, 0.1);
-            color: #f39c12;
-            border: 1px solid rgba(243, 156, 18, 0.2);
+        .status-badge.pending {
+            background-color: rgba(251, 191, 36, 0.1);
+            color: #d97706;
+        }
+
+        .status-badge.approved {
+            background-color: rgba(52, 211, 153, 0.1);
+            color: #059669;
+        }
+
+        .status-badge.rejected {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
         }
 
         .status-badge.completed {
-            background-color: rgba(149, 165, 166, 0.1);
-            color: #7f8c8d;
-            border: 1px solid rgba(149, 165, 166, 0.2);
+            background-color: rgba(156, 163, 175, 0.1);
+            color: #4b5563;
         }
 
         .status-badge.in_progress {
-            background-color: rgba(52, 152, 219, 0.1);
-            color: #2980b9;
-            border: 1px solid rgba(52, 152, 219, 0.2);
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
         }
 
         /* Loading state */
         .loading {
-            padding: 20px;
+            padding: 30px;
             text-align: center;
-            color: #777;
+            color: var(--gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
 
         .loading i {
-            margin-right: 10px;
+            font-size: 1.5rem;
+            color: var(--primary);
             animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 0.95rem;
         }
 
         @keyframes spin {
@@ -318,44 +412,106 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Print Voucher Button */
+        .print-voucher-btn {
+            display: none;
+            margin-top: 20px;
+        }
+
         /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .activity-info {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .header {
+                padding: 0 25px;
+            }
+            
+            .main-content {
+                padding: 25px;
+            }
+        }
+
         @media (max-width: 768px) {
+            .header {
+                padding: 0 20px;
+                height: 70px;
+            }
+            
+            .logo-text {
+                font-size: 1.3rem;
+            }
+            
+            .logo-icon {
+                font-size: 1.5rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .activity-info {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .page-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 576px) {
             .header {
                 padding: 0 15px;
             }
             
-            .logo-text {
-                font-size: 1.2rem;
+            .user-name {
+                display: none;
             }
             
-            .main-content {
-                padding: 15px;
+            .activity-info {
+                grid-template-columns: 1fr;
             }
             
-            .activity-info-item {
-                flex-direction: column;
-            }
-            
-            .activity-info-label {
-                margin-bottom: 5px;
+            .budget-table th, 
+            .budget-table td {
+                padding: 12px 10px;
+                font-size: 0.85rem;
             }
         }
-        .voucher-section {
-    background-color: white;
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    text-align: center;
-}
 
-/* Add this to your existing button styles */
-.btn.print-btn {
-    background-color: #27ae60;
-}
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
 
-.btn.print-btn:hover {
-    background-color: #219653;
-}
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
     </style>
 </head>
 <body>
@@ -363,19 +519,20 @@
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-project-diagram"></i>
+                    <i class="fas fa-wallet"></i>
                 </div>
                 <div>
-                    <span class="logo-text">RCDNET</span>
-                    
+                    <span class="logo-text">RCDNET Finance</span>
+                    <span class="logo-subtext">Budget Management System</span>
                 </div>
             </div>
             <div class="header-actions">
                 <div class="user-profile">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+                    <div class="user-avatar">F</div>
+                    <div>
+                        <div class="user-name">Finance Officer</div>
+                        <div class="user-role">Administrator</div>
                     </div>
-                    <span class="user-name">Finance</span>
                 </div>
             </div>
         </div>
@@ -383,47 +540,62 @@
 
     <div class="container">
         <main class="main-content">
-            <h1 class="page-title">
-                <i class="fas fa-file-invoice-dollar"></i>
-                Activity Budget Viewer
-            </h1>
-
-            <div class="selection-section">
-                <div class="form-group">
-                    <label for="projectSelect">Select Project</label>
-                    <select id="projectSelect">
-                        <option value="">Loading projects...</option>
-                    </select>
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Activity Budget Management
+                </h1>
+                <div class="page-actions">
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <i class="fas fa-sync-alt btn-icon"></i> Refresh
+                    </button>
                 </div>
-                
-                <div class="form-group">
-                    <label for="activitySelect">Select Activity</label>
-                    <select id="activitySelect" disabled>
-                        <option value="">Please select a project first</option>
-                    </select>
-                </div>
-                
-                <button class="btn" id="viewBudgetBtn" disabled>
-                    <i class="fas fa-eye"></i> View Budget
-                </button>
             </div>
 
-            <div class="budget-section" id="budgetSection" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Select Activity</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label" for="projectSelect">Project</label>
+                        <select class="form-control" id="projectSelect">
+                            <option value="">Loading projects...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="activitySelect">Activity</label>
+                        <select class="form-control" id="activitySelect" disabled>
+                            <option value="">Select a project first</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="viewBudgetBtn" disabled>
+                        <i class="fas fa-eye btn-icon"></i> View Budget Details
+                    </button>
+                </div>
+            </div>
+
+            <div class="card" id="budgetSection" style="display: none;">
                 <div class="activity-info" id="activityInfo">
                     <!-- Activity details will be loaded here -->
                 </div>
                 
-                <div class="section-header">
-                    <h2 class="section-title">Budget Details</h2>
+                <div class="card-header">
+                    <h2 class="card-title">Budget Breakdown</h2>
+                    <button class="btn btn-primary" id="printVoucherBtn" style="display: none;">
+                        <i class="fas fa-print btn-icon"></i> Print Payment Voucher
+                    </button>
                 </div>
 
                 <div class="table-responsive">
                     <table class="budget-table" id="budgetTable">
                         <thead>
                             <tr>
-                                <th>Item Name</th>
+                                <th>Item</th>
                                 <th>Category</th>
-                                <th>Quantity</th>
+                                <th>Qty</th>
                                 <th>Unit Price (UGX)</th>
                                 <th>Total (UGX)</th>
                                 <th>Description</th>
@@ -437,11 +609,6 @@
                 
                 <div class="budget-total" id="budgetTotal">
                     Total Budget: UGX 0
-                </div>
-                <div class="voucher-section" id="voucherSection" style="display: none; margin-top: 30px;">
-                    <button class="btn" id="printVoucherBtn">
-                        <i class="fas fa-print"></i> Print Payment Voucher
-                    </button>
                 </div>
             </div>
         </main>
@@ -457,20 +624,34 @@
             const budgetTableBody = document.getElementById('budgetTableBody');
             const budgetTotal = document.getElementById('budgetTotal');
             const activityInfo = document.getElementById('activityInfo');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const printVoucherBtn = document.getElementById('printVoucherBtn');
             
             // Variables
             let currentActivityId = null;
+            let currentActivity = null;
             let activities = [];
             
             // Event Listeners
             projectSelect.addEventListener('change', loadActivitiesForProject);
             viewBudgetBtn.addEventListener('click', viewActivityBudget);
+            refreshBtn.addEventListener('click', refreshData);
+            printVoucherBtn.addEventListener('click', printPaymentVoucher);
             
             // Initialize the page
             loadProjects();
             
             // Functions
+            function refreshData() {
+                loadProjects();
+                if (currentActivityId) {
+                    viewActivityBudget();
+                }
+            }
+            
             function loadProjects() {
+                projectSelect.innerHTML = '<option value="">Loading projects...</option>';
+                
                 fetch('https://backend-jz65.onrender.com/projects/')
                     .then(response => {
                         if (!response.ok) throw new Error('Failed to fetch projects');
@@ -500,7 +681,7 @@
                 const projectId = projectSelect.value;
                 
                 if (!projectId) {
-                    activitySelect.innerHTML = '<option value="">Please select a project first</option>';
+                    activitySelect.innerHTML = '<option value="">Select a project first</option>';
                     activitySelect.disabled = true;
                     viewBudgetBtn.disabled = true;
                     return;
@@ -530,7 +711,7 @@
                             
                             activitySelect.disabled = false;
                         } else {
-                            activitySelect.innerHTML = '<option value="">No activities available for this project</option>';
+                            activitySelect.innerHTML = '<option value="">No activities for this project</option>';
                             activitySelect.disabled = true;
                         }
                     })
@@ -542,65 +723,76 @@
             }
             
             function viewActivityBudget() {
-    currentActivityId = activitySelect.value;
-    
-    if (!currentActivityId) {
-        alert('Please select an activity first');
-        return;
-    }
-    
-    // Find the selected activity
-    const selectedActivity = activities.find(activity => activity.id == currentActivityId);
-    
-    if (!selectedActivity) {
-        alert('Activity not found');
-        return;
-    }
-    
-    // Display activity info
-    activityInfo.innerHTML = `
-        <div class="activity-info-item">
-            <span class="activity-info-label">Activity Name:</span>
-            <span>${selectedActivity.name}</span>
-        </div>
-        <div class="activity-info-item">
-            <span class="activity-info-label">Project:</span>
-            <span>${selectedActivity.project_name}</span>
-        </div>
-        <div class="activity-info-item">
-            <span class="activity-info-label">Status:</span>
-            <span class="status-badge ${selectedActivity.status}">${selectedActivity.status.replace('_', ' ')}</span>
-        </div>
-        <div class="activity-info-item">
-            <span class="activity-info-label">Start Date:</span>
-            <span>${selectedActivity.start_date}</span>
-        </div>
-        <div class="activity-info-item">
-            <span class="activity-info-label">End Date:</span>
-            <span>${selectedActivity.end_date}</span>
-        </div>
-        <div class="activity-info-item">
-            <span class="activity-info-label">Description:</span>
-            <span>${selectedActivity.description || 'No description available'}</span>
-        </div>
-    `;
-    
-    // Load budget items for the project (since activities share the project budget)
-    loadBudgetItems(selectedActivity.project_id);
-    
-    // Check approval status
-    checkApprovalStatus(currentActivityId);
-    
-    // Show the budget section
-    budgetSection.style.display = 'block';
-    
-    // Scroll to the budget section
-    budgetSection.scrollIntoView({ behavior: 'smooth' });
-}
-
+                currentActivityId = activitySelect.value;
+                
+                if (!currentActivityId) {
+                    alert('Please select an activity first');
+                    return;
+                }
+                
+                // Find the selected activity
+                currentActivity = activities.find(activity => activity.id == currentActivityId);
+                
+                if (!currentActivity) {
+                    alert('Activity not found');
+                    return;
+                }
+                
+                // Display activity info
+                activityInfo.innerHTML = `
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Activity Name</span>
+                        <span class="activity-info-value">${currentActivity.name}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Project</span>
+                        <span class="activity-info-value">${currentActivity.project_name}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Status</span>
+                        <span class="activity-info-value">
+                            <span class="status-badge ${currentActivity.status}">
+                                <i class="fas fa-circle"></i>
+                                ${currentActivity.status.replace('_', ' ')}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Budget</span>
+                        <span class="activity-info-value">UGX ${currentActivity.budget.toLocaleString()}</span>
+                    </div>
+                    <div class="activity-info-item">
+                        <span class="activity-info-label">Period</span>
+                        <span class="activity-info-value">${formatDate(currentActivity.start_date)} to ${formatDate(currentActivity.end_date)}</span>
+                    </div>
+                `;
+                
+                // Load budget items for the activity
+                loadBudgetItems(currentActivity.project_id);
+                
+                // Show/hide print voucher button based on status
+                if (currentActivity.status === 'approved') {
+                    printVoucherBtn.style.display = 'inline-flex';
+                } else {
+                    printVoucherBtn.style.display = 'none';
+                }
+                
+                // Show the budget section
+                budgetSection.style.display = 'block';
+                
+                // Scroll to the budget section
+                budgetSection.scrollIntoView({ behavior: 'smooth' });
+            }
             
             function loadBudgetItems(projectId) {
-                budgetTableBody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i> Loading budget items...</td></tr>';
+                budgetTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <span class="loading-text">Loading budget items...</span>
+                        </td>
+                    </tr>
+                `;
                 
                 fetch(`https://backend-jz65.onrender.com/budget-items/${projectId}`)
                     .then(response => {
@@ -611,7 +803,13 @@
                         budgetTableBody.innerHTML = '';
                         
                         if (items.length === 0) {
-                            budgetTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No budget items found for this activity</td></tr>';
+                            budgetTableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 30px; color: var(--gray);">
+                                        No budget items found for this activity
+                                    </td>
+                                </tr>
+                            `;
                             budgetTotal.textContent = 'Total Budget: UGX 0';
                             return;
                         }
@@ -637,8 +835,142 @@
                     })
                     .catch(error => {
                         console.error('Error loading budget items:', error);
-                        budgetTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--accent-color);">Failed to load budget items</td></tr>';
+                        budgetTableBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px; color: var(--danger);">
+                                    <i class="fas fa-exclamation-circle"></i> Failed to load budget items
+                                </td>
+                            </tr>
+                        `;
                     });
+            }
+            
+            function printPaymentVoucher() {
+                if (!currentActivity) return;
+                
+                // Create a printable voucher HTML
+                const voucherHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Payment Voucher - ${currentActivity.name}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                            .voucher { max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; }
+                            .header { text-align: center; margin-bottom: 30px; }
+                            .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+                            .title { font-size: 20px; text-decoration: underline; margin-bottom: 30px; }
+                            .details { margin-bottom: 30px; }
+                            .detail-row { display: flex; margin-bottom: 10px; }
+                            .detail-label { font-weight: bold; width: 150px; }
+                            .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                            .table th, .table td { border: 1px solid #000; padding: 8px; text-align: left; }
+                            .signature { margin-top: 50px; display: flex; justify-content: space-between; }
+                            .signature-box { width: 200px; border-top: 1px solid #000; padding-top: 5px; }
+                            .footer { margin-top: 30px; font-size: 12px; text-align: center; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="voucher">
+                            <div class="header">
+                                <div class="logo">RCDNET</div>
+                                <div>Payment Voucher</div>
+                            </div>
+                            
+                            <div class="title">Activity: ${currentActivity.name}</div>
+                            
+                            <div class="details">
+                                <div class="detail-row">
+                                    <div class="detail-label">Project:</div>
+                                    <div>${currentActivity.project_name}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Voucher Date:</div>
+                                    <div>${new Date().toLocaleDateString()}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Total Amount:</div>
+                                    <div>UGX ${currentActivity.budget.toLocaleString()}</div>
+                                </div>
+                            </div>
+                            
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Description</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="voucherItems">
+                                    <!-- Items will be populated by JavaScript -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" style="text-align: right; font-weight: bold;">Total:</td>
+                                        <td>UGX ${currentActivity.budget.toLocaleString()}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            
+                            <div class="signature">
+                                <div class="signature-box">
+                                    Prepared by: ________________________
+                                </div>
+                                <div class="signature-box">
+                                    Approved by: ________________________
+                                </div>
+                            </div>
+                            
+                            <div class="footer">
+                                This is a computer generated voucher and does not require a signature
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                // Open a new window with the voucher
+                const voucherWindow = window.open('', '_blank');
+                voucherWindow.document.write(voucherHTML);
+                
+                // Fetch and populate the items in the voucher
+                fetch(`https://backend-jz65.onrender.com/budget-items/${currentActivity.project_id}`)
+                    .then(response => response.json())
+                    .then(items => {
+                        const voucherItems = voucherWindow.document.getElementById('voucherItems');
+                        items.forEach(item => {
+                            const row = voucherWindow.document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${item.item_name}</td>
+                                <td>${item.description || '-'}</td>
+                                <td>${item.quantity}</td>
+                                <td>UGX ${item.unit_price.toLocaleString()}</td>
+                                <td>UGX ${item.total.toLocaleString()}</td>
+                            `;
+                            voucherItems.appendChild(row);
+                        });
+                        
+                        // After populating, give a moment for rendering then print
+                        setTimeout(() => {
+                            voucherWindow.print();
+                        }, 500);
+                    })
+                    .catch(error => {
+                        console.error('Error loading items for voucher:', error);
+                        voucherWindow.document.getElementById('voucherItems').innerHTML = `
+                            <tr>
+                                <td colspan="5" style="text-align: center;">Failed to load items</td>
+                            </tr>
+                        `;
+                    });
+            }
+            
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
             }
             
             // Enable view button when activity is selected
@@ -646,149 +978,6 @@
                 viewBudgetBtn.disabled = !this.value;
             });
         });
-        function checkApprovalStatus(activityId) {
-    fetch(`https://backend-jz65.onrender.com/activity-approvals/`)
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch approval status');
-            return response.json();
-        })
-        .then(approvals => {
-            const activityApproval = approvals.find(approval => approval.activity_id == activityId);
-            const voucherSection = document.getElementById('voucherSection');
-            
-            if (activityApproval && activityApproval.status === 'approved') {
-                voucherSection.style.display = 'block';
-                
-                // Set up the print button
-                document.getElementById('printVoucherBtn').addEventListener('click', function() {
-                    generateVoucher(activityApproval);
-                });
-            } else {
-                voucherSection.style.display = 'none';
-            }
-        })
-        .catch(error => {
-            console.error('Error checking approval status:', error);
-        });
-}
-
-function generateVoucher(approval) {
-    // Create a new window for the voucher
-    const voucherWindow = window.open('', '_blank');
-    
-    // Get the current date
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('en-US', {
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric'
-    });
-    
-    // Get the activity details
-    const activity = activities.find(a => a.id == approval.activity_id);
-    
-    // Calculate the total budget
-    let totalBudget = 0;
-    const budgetRows = Array.from(document.querySelectorAll('#budgetTableBody tr')).map(row => {
-        const cells = row.cells;
-        const itemTotal = parseFloat(cells[4].textContent.replace(/,/g, ''));
-        totalBudget += itemTotal;
-        
-        return `
-            <tr>
-                <td>${cells[0].textContent}</td>
-                <td>${cells[1].textContent}</td>
-                <td style="text-align: right;">${cells[2].textContent}</td>
-                <td style="text-align: right;">${cells[3].textContent}</td>
-                <td style="text-align: right;">${cells[4].textContent}</td>
-            </tr>
-        `;
-    }).join('');
-    
-    // Create the voucher HTML
-    voucherWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Payment Voucher - ${activity.name}</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                .voucher-header { text-align: center; margin-bottom: 30px; }
-                .voucher-title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-                .voucher-subtitle { font-size: 18px; color: #555; margin-bottom: 20px; }
-                .voucher-details { margin-bottom: 30px; }
-                .voucher-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                .voucher-table th, .voucher-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                .voucher-table th { background-color: #f2f2f2; }
-                .voucher-total { text-align: right; font-weight: bold; font-size: 18px; margin-bottom: 30px; }
-                .voucher-footer { margin-top: 50px; display: flex; justify-content: space-between; }
-                .signature-line { border-top: 1px solid #000; width: 200px; margin-top: 40px; }
-                .logo { text-align: center; margin-bottom: 20px; }
-                .logo img { max-width: 150px; }
-            </style>
-        </head>
-        <body>
-            <div class="logo">
-                <h2>RCDNET</h2>
-                <p>Payment Voucher</p>
-            </div>
-            
-            <div class="voucher-details">
-                <p><strong>Activity:</strong> ${activity.name}</p>
-                <p><strong>Project:</strong> ${activity.project_name}</p>
-                <p><strong>Voucher Date:</strong> ${formattedDate}</p>
-                <p><strong>Approved On:</strong> ${new Date(approval.approved_at).toLocaleDateString()}</p>
-                <p><strong>Approved By:</strong> ${approval.approved_by}</p>
-            </div>
-            
-            <table class="voucher-table">
-                <thead>
-                    <tr>
-                        <th>Item Name</th>
-                        <th>Category</th>
-                        <th>Quantity</th>
-                        <th>Unit Price (UGX)</th>
-                        <th>Total (UGX)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${budgetRows}
-                </tbody>
-            </table>
-            
-            <div class="voucher-total">
-                Total Amount: UGX ${totalBudget.toLocaleString()}
-            </div>
-            
-            <div class="voucher-footer">
-                <div>
-                    <p>Prepared By:</p>
-                    <div class="signature-line"></div>
-                    <p>Finance Department</p>
-                </div>
-                <div>
-                    <p>Approved By:</p>
-                    <div class="signature-line"></div>
-                    <p>${approval.approved_by}</p>
-                </div>
-            </div>
-            
-            <script>
-                // Print automatically when loaded
-                window.onload = function() {
-                    setTimeout(function() {
-                        window.print();
-                        window.close();
-                    }, 500);
-                };
-            </script>
-        </body>
-        </html>
-    `);
-    
-    voucherWindow.document.close();
-}
-
     </script>
 </body>
 </html>
