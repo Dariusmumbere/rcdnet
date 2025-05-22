@@ -139,6 +139,12 @@ async function loadProgramCards() {
             for (const [programName, cardElement] of Object.entries(programCards)) {
                 if (cardElement && data.program_balances[programName] !== undefined) {
                     cardElement.textContent = `UGX ${data.program_balances[programName].toLocaleString()}`;
+                    
+                    // Add animation to show update
+                    cardElement.classList.add('balance-updated');
+                    setTimeout(() => {
+                        cardElement.classList.remove('balance-updated');
+                    }, 1000);
                 }
             }
         }
@@ -162,5 +168,4 @@ async function loadProgramCards() {
         document.querySelector('.dashboard-content').prepend(errorElement);
     }
 }
-
 
