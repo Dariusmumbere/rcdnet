@@ -143,57 +143,66 @@ function showBudgetCreationModal(activityId, activityName) {
 // Function to load activities list
 async function loadActivities() {
     try {
-        const response = await fetch('https://backend-jz65.onrender.com/activities/');
-        if (!response.ok) throw new Error('Failed to fetch activities');
-        
-        const activities = await response.json();
         const tableBody = document.getElementById('activitiesTableBody');
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading activities...</td></tr>';
+        
+        const response = await fetch('https://backend-jz65.onrender.com/activities/');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const activities = Array.isArray(data) ? data : (data.activities || []);
+        
         tableBody.innerHTML = '';
+        
+        if (activities.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No activities found</td></tr>';
+            return;
+        }
         
         activities.forEach(activity => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${activity.name}</td>
-                <td>${activity.project_name}</td>
-                <td>${activity.start_date}</td>
-                <td>${activity.end_date}</td>
-                <td>UGX ${activity.budget.toLocaleString()}</td>
-                <td>
-                    <span class="status-badge ${activity.status}">${activity.status}</span>
-                    ${activity.status === 'pending' ? '<span class="status-badge pending">Pending Approval</span>' : ''}
-                </td>
+                <td>${activity.name || 'N/A'}</td>
+                <td>${activity.project_name || activity.project_id || 'N/A'}</td>
+                <td>${activity.start_date || 'N/A'}</td>
+                <td>${activity.end_date || 'N/A'}</td>
+                <td>UGX ${activity.budget ? activity.budget.toLocaleString() : '0'}</td>
+                <td><span class="status-badge ${activity.status ? activity.status.replace(' ', '_') : 'pending'}">
+                    ${activity.status || 'pending'}
+                </span></td>
                 <td>
                     <button class="action-btn view-btn" onclick="viewActivity(${activity.id})">
                         <i class="fas fa-eye"></i>
                     </button>
-                    ${activity.status === 'pending' ? `
                     <button class="action-btn edit-btn" onclick="editActivity(${activity.id})">
                         <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
+                        <i class="fas fa-coins"></i>
                     </button>
                     <button class="action-btn delete-btn" onclick="deleteActivity(${activity.id})">
                         <i class="fas fa-trash"></i>
                     </button>
-                    ` : `
-                    <button class="action-btn budget-btn" onclick="manageActivityBudget(${activity.id}, '${activity.name}')">
-                        <i class="fas fa-coins"></i>
-                    </button>
-                    `}
-                    ${activity.status === 'pending' && currentRole === 'program_officer' ? `
-                    <button class="action-btn request-btn" onclick="requestActivityApproval(${activity.id}, '${activity.name}')">
-                        <i class="fas fa-paper-plane"></i> Request Approval
-                    </button>
-                    ` : ''}
                 </td>
             `;
             tableBody.appendChild(row);
         });
+        
     } catch (error) {
         console.error('Error loading activities:', error);
-        document.getElementById('activitiesTableBody').innerHTML = 
-            '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load activities</td></tr>';
+        const tableBody = document.getElementById('activitiesTableBody');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: red;">
+                    Failed to load activities: ${error.message}
+                </td>
+            </tr>
+        `;
     }
 }
-
 // Initialize the button when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     setupCreateActivityButton();
