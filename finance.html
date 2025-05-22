@@ -418,6 +418,13 @@
             margin-top: 20px;
         }
 
+        /* Voucher action buttons */
+        .voucher-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 1200px) {
             .activity-info {
@@ -470,6 +477,10 @@
             .page-actions {
                 width: 100%;
                 justify-content: flex-end;
+            }
+
+            .voucher-actions {
+                flex-direction: column;
             }
         }
 
@@ -584,9 +595,14 @@
                 
                 <div class="card-header">
                     <h2 class="card-title">Budget Breakdown</h2>
-                    <button class="btn btn-primary" id="printVoucherBtn" style="display: none;">
-                        <i class="fas fa-print btn-icon"></i> Print Payment Voucher
-                    </button>
+                    <div class="voucher-actions" id="voucherActions" style="display: none;">
+                        <button class="btn btn-primary" id="printVoucherBtn">
+                            <i class="fas fa-print btn-icon"></i> Print Voucher
+                        </button>
+                        <button class="btn btn-outline" id="downloadVoucherBtn">
+                            <i class="fas fa-download btn-icon"></i> Download Voucher
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-responsive">
@@ -626,17 +642,22 @@
             const activityInfo = document.getElementById('activityInfo');
             const refreshBtn = document.getElementById('refreshBtn');
             const printVoucherBtn = document.getElementById('printVoucherBtn');
+            const downloadVoucherBtn = document.getElementById('downloadVoucherBtn');
+            const voucherActions = document.getElementById('voucherActions');
             
             // Variables
             let currentActivityId = null;
             let currentActivity = null;
             let activities = [];
+            let budgetItems = [];
+            let totalBudgetAmount = 0;
             
             // Event Listeners
             projectSelect.addEventListener('change', loadActivitiesForProject);
             viewBudgetBtn.addEventListener('click', viewActivityBudget);
             refreshBtn.addEventListener('click', refreshData);
             printVoucherBtn.addEventListener('click', printPaymentVoucher);
+            downloadVoucherBtn.addEventListener('click', downloadPaymentVoucher);
             
             // Initialize the page
             loadProjects();
@@ -770,11 +791,11 @@
                 // Load budget items for the activity
                 loadBudgetItems(currentActivity.project_id);
                 
-                // Show/hide print voucher button based on status
+                // Show/hide voucher actions based on status
                 if (currentActivity.status === 'approved') {
-                    printVoucherBtn.style.display = 'inline-flex';
+                    voucherActions.style.display = 'flex';
                 } else {
-                    printVoucherBtn.style.display = 'none';
+                    voucherActions.style.display = 'none';
                 }
                 
                 // Show the budget section
@@ -800,7 +821,9 @@
                         return response.json();
                     })
                     .then(items => {
+                        budgetItems = items;
                         budgetTableBody.innerHTML = '';
+                        totalBudgetAmount = 0;
                         
                         if (items.length === 0) {
                             budgetTableBody.innerHTML = `
@@ -814,10 +837,8 @@
                             return;
                         }
                         
-                        let totalBudget = 0;
-                        
                         items.forEach(item => {
-                            totalBudget += item.total;
+                            totalBudgetAmount += item.total;
                             
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -831,7 +852,7 @@
                             budgetTableBody.appendChild(row);
                         });
                         
-                        budgetTotal.textContent = `Total Budget: UGX ${totalBudget.toLocaleString()}`;
+                        budgetTotal.textContent = `Total Budget: UGX ${totalBudgetAmount.toLocaleString()}`;
                     })
                     .catch(error => {
                         console.error('Error loading budget items:', error);
@@ -845,36 +866,160 @@
                     });
             }
             
-            function printPaymentVoucher() {
-                if (!currentActivity) return;
+            function generateVoucherHTML() {
+                if (!currentActivity) return '';
                 
-                // Create a printable voucher HTML
-                const voucherHTML = `
+                // Format the current date
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // Generate items HTML
+                let itemsHTML = '';
+                budgetItems.forEach(item => {
+                    itemsHTML += `
+                        <tr>
+                            <td>${item.item_name}</td>
+                            <td>${item.description || '-'}</td>
+                            <td>${item.quantity}</td>
+                            <td>UGX ${item.unit_price.toLocaleString()}</td>
+                            <td>UGX ${item.total.toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+                
+                return `
                     <!DOCTYPE html>
                     <html>
                     <head>
                         <title>Payment Voucher - ${currentActivity.name}</title>
                         <style>
-                            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-                            .voucher { max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; }
-                            .header { text-align: center; margin-bottom: 30px; }
-                            .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-                            .title { font-size: 20px; text-decoration: underline; margin-bottom: 30px; }
-                            .details { margin-bottom: 30px; }
-                            .detail-row { display: flex; margin-bottom: 10px; }
-                            .detail-label { font-weight: bold; width: 150px; }
-                            .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                            .table th, .table td { border: 1px solid #000; padding: 8px; text-align: left; }
-                            .signature { margin-top: 50px; display: flex; justify-content: space-between; }
-                            .signature-box { width: 200px; border-top: 1px solid #000; padding-top: 5px; }
-                            .footer { margin-top: 30px; font-size: 12px; text-align: center; }
+                            body { 
+                                font-family: 'Inter', Arial, sans-serif; 
+                                margin: 0; 
+                                padding: 20px; 
+                                color: #333;
+                            }
+                            .voucher { 
+                                max-width: 800px; 
+                                margin: 0 auto; 
+                                border: 1px solid #e0e0e0; 
+                                padding: 30px; 
+                                background: white;
+                                box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+                            }
+                            .header { 
+                                text-align: center; 
+                                margin-bottom: 30px; 
+                                padding-bottom: 20px;
+                                border-bottom: 1px solid #e0e0e0;
+                            }
+                            .logo { 
+                                font-size: 24px; 
+                                font-weight: bold; 
+                                margin-bottom: 5px;
+                                color: #4361ee;
+                            }
+                            .organization { 
+                                font-size: 14px; 
+                                color: #666;
+                                margin-bottom: 5px;
+                            }
+                            .title { 
+                                font-size: 20px; 
+                                text-align: center;
+                                margin: 30px 0;
+                                font-weight: 600;
+                                color: #4361ee;
+                            }
+                            .voucher-number {
+                                text-align: right;
+                                font-size: 14px;
+                                color: #666;
+                                margin-bottom: 20px;
+                            }
+                            .details { 
+                                margin-bottom: 30px; 
+                            }
+                            .detail-row { 
+                                display: flex; 
+                                margin-bottom: 10px; 
+                            }
+                            .detail-label { 
+                                font-weight: bold; 
+                                width: 150px; 
+                                color: #555;
+                            }
+                            .table { 
+                                width: 100%; 
+                                border-collapse: collapse; 
+                                margin-bottom: 30px; 
+                                font-size: 14px;
+                            }
+                            .table th { 
+                                background-color: #f8f9ff; 
+                                padding: 10px; 
+                                text-align: left;
+                                border: 1px solid #e0e0e0;
+                                font-weight: 600;
+                            }
+                            .table td { 
+                                padding: 10px; 
+                                border: 1px solid #e0e0e0; 
+                                text-align: left;
+                            }
+                            .total-row {
+                                font-weight: bold;
+                                background-color: #f8f9ff;
+                            }
+                            .signature { 
+                                margin-top: 50px; 
+                                display: flex; 
+                                justify-content: space-between; 
+                            }
+                            .signature-box { 
+                                width: 200px; 
+                                border-top: 1px solid #000; 
+                                padding-top: 5px; 
+                                text-align: center;
+                                font-size: 14px;
+                            }
+                            .footer { 
+                                margin-top: 30px; 
+                                font-size: 12px; 
+                                text-align: center; 
+                                color: #999;
+                                padding-top: 20px;
+                                border-top: 1px solid #e0e0e0;
+                            }
+                            .watermark {
+                                position: fixed;
+                                opacity: 0.1;
+                                font-size: 80px;
+                                color: #4361ee;
+                                transform: rotate(-45deg);
+                                left: 20%;
+                                top: 40%;
+                                z-index: -1;
+                                font-weight: bold;
+                            }
                         </style>
                     </head>
                     <body>
                         <div class="voucher">
+                            <div class="watermark">RCDNET</div>
+                            
                             <div class="header">
                                 <div class="logo">RCDNET</div>
-                                <div>Payment Voucher</div>
+                                <div class="organization">Rural Community Development Network</div>
+                                <div>OFFICIAL PAYMENT VOUCHER</div>
+                            </div>
+                            
+                            <div class="voucher-number">
+                                Voucher #: ${'V' + Math.floor(1000 + Math.random() * 9000)}
                             </div>
                             
                             <div class="title">Activity: ${currentActivity.name}</div>
@@ -886,11 +1031,15 @@
                                 </div>
                                 <div class="detail-row">
                                     <div class="detail-label">Voucher Date:</div>
-                                    <div>${new Date().toLocaleDateString()}</div>
+                                    <div>${formattedDate}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label">Total Amount:</div>
-                                    <div>UGX ${currentActivity.budget.toLocaleString()}</div>
+                                    <div class="detail-label">Activity Period:</div>
+                                    <div>${formatDate(currentActivity.start_date)} to ${formatDate(currentActivity.end_date)}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Prepared By:</div>
+                                    <div>Finance Department</div>
                                 </div>
                             </div>
                             
@@ -904,73 +1053,129 @@
                                         <th>Total</th>
                                     </tr>
                                 </thead>
-                                <tbody id="voucherItems">
-                                    <!-- Items will be populated by JavaScript -->
+                                <tbody>
+                                    ${itemsHTML}
                                 </tbody>
                                 <tfoot>
-                                    <tr>
-                                        <td colspan="4" style="text-align: right; font-weight: bold;">Total:</td>
-                                        <td>UGX ${currentActivity.budget.toLocaleString()}</td>
+                                    <tr class="total-row">
+                                        <td colspan="4" style="text-align: right;">Total Amount:</td>
+                                        <td>UGX ${totalBudgetAmount.toLocaleString()}</td>
+                                    </tr>
+                                    <tr class="total-row">
+                                        <td colspan="4" style="text-align: right;">Amount in Words:</td>
+                                        <td>${numberToWords(totalBudgetAmount)} Shillings Only</td>
                                     </tr>
                                 </tfoot>
                             </table>
                             
                             <div class="signature">
                                 <div class="signature-box">
-                                    Prepared by: ________________________
+                                    Prepared by: <br><br>
+                                    ________________________<br>
+                                    Name: <br>
+                                    Date: 
                                 </div>
                                 <div class="signature-box">
-                                    Approved by: ________________________
+                                    Approved by: <br><br>
+                                    ________________________<br>
+                                    Name: <br>
+                                    Date: 
+                                </div>
+                                <div class="signature-box">
+                                    Received by: <br><br>
+                                    ________________________<br>
+                                    Name: <br>
+                                    Date: 
                                 </div>
                             </div>
                             
                             <div class="footer">
-                                This is a computer generated voucher and does not require a signature
+                                This is an official payment voucher from RCDNET Finance Department.<br>
+                                For any inquiries, please contact finance@rcdnet.org
                             </div>
                         </div>
                     </body>
                     </html>
                 `;
+            }
+            
+            function printPaymentVoucher() {
+                if (!currentActivity) return;
+                
+                const voucherHTML = generateVoucherHTML();
+                if (!voucherHTML) return;
                 
                 // Open a new window with the voucher
                 const voucherWindow = window.open('', '_blank');
                 voucherWindow.document.write(voucherHTML);
                 
-                // Fetch and populate the items in the voucher
-                fetch(`https://backend-jz65.onrender.com/budget-items/${currentActivity.project_id}`)
-                    .then(response => response.json())
-                    .then(items => {
-                        const voucherItems = voucherWindow.document.getElementById('voucherItems');
-                        items.forEach(item => {
-                            const row = voucherWindow.document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${item.item_name}</td>
-                                <td>${item.description || '-'}</td>
-                                <td>${item.quantity}</td>
-                                <td>UGX ${item.unit_price.toLocaleString()}</td>
-                                <td>UGX ${item.total.toLocaleString()}</td>
-                            `;
-                            voucherItems.appendChild(row);
-                        });
-                        
-                        // After populating, give a moment for rendering then print
-                        setTimeout(() => {
-                            voucherWindow.print();
-                        }, 500);
-                    })
-                    .catch(error => {
-                        console.error('Error loading items for voucher:', error);
-                        voucherWindow.document.getElementById('voucherItems').innerHTML = `
-                            <tr>
-                                <td colspan="5" style="text-align: center;">Failed to load items</td>
-                            </tr>
-                        `;
-                    });
+                // After populating, give a moment for rendering then print
+                setTimeout(() => {
+                    voucherWindow.print();
+                }, 500);
+            }
+            
+            function downloadPaymentVoucher() {
+                if (!currentActivity) return;
+                
+                const voucherHTML = generateVoucherHTML();
+                if (!voucherHTML) return;
+                
+                // Create a Blob with the voucher HTML
+                const blob = new Blob([voucherHTML], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                
+                // Create a download link
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Payment_Voucher_${currentActivity.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`;
+                
+                // Trigger the download
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
             }
             
             function formatDate(dateString) {
                 const options = { year: 'numeric', month: 'short', day: 'numeric' };
                 return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+            
+            function numberToWords(num) {
+                // Convert number to words (simplified version)
+                const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+                const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+                const tens = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+                
+                if (num === 0) return 'Zero';
+                
+                function convertLessThanOneThousand(n) {
+                    if (n === 0) return '';
+                    if (n < 10) return units[n];
+                    if (n < 20) return teens[n - 10];
+                    if (n < 100) return tens[Math.floor(n / 10)] + ' ' + units[n % 10];
+                    return units[Math.floor(n / 100)] + ' Hundred ' + convertLessThanOneThousand(n % 100);
+                }
+                
+                let result = '';
+                const scales = ['', 'Thousand', 'Million', 'Billion', 'Trillion'];
+                let scaleIndex = 0;
+                
+                while (num > 0) {
+                    const chunk = num % 1000;
+                    if (chunk !== 0) {
+                        result = convertLessThanOneThousand(chunk) + ' ' + scales[scaleIndex] + ' ' + result;
+                    }
+                    num = Math.floor(num / 1000);
+                    scaleIndex++;
+                }
+                
+                return result.trim();
             }
             
             // Enable view button when activity is selected
