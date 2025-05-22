@@ -764,8 +764,13 @@ async function requestActivityApproval(activityId, activityName) {
 }
 
 // Function to approve/reject an activity (for Director)
+// Function to approve/reject an activity (for Director)
 async function reviewActivityApproval(approvalId, decision) {
     const responseComments = prompt(`Enter your comments for ${decision === 'approved' ? 'approval' : 'rejection'}:`) || '';
+    
+    if (decision === 'approved' && !confirm(`Are you sure you want to approve this activity? This will deduct the budget from the program area and main account.`)) {
+        return;
+    }
     
     try {
         const response = await fetch(`https://backend-jz65.onrender.com/activity-approvals/${approvalId}`, {
@@ -781,7 +786,8 @@ async function reviewActivityApproval(approvalId, decision) {
         });
         
         if (!response.ok) {
-            throw new Error('Failed to submit decision');
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to submit decision');
         }
         
         const data = await response.json();
@@ -795,6 +801,13 @@ async function reviewActivityApproval(approvalId, decision) {
         console.error('Error reviewing approval:', error);
         alert(`Failed to submit decision: ${error.message}`);
     }
+}
+// Helper function to check if element contains text (for jQuery-like :contains selector)
+function containsText(selector, text) {
+    const elements = document.querySelectorAll(selector);
+    return Array.from(elements).filter(el => 
+        el.textContent.toLowerCase().includes(text.toLowerCase())
+    );
 }
 
 // Function to load pending approvals (for Director)
