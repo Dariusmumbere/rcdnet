@@ -450,7 +450,7 @@
             
             // Functions
             function loadProjects() {
-                fetch('https://man-m681.onrender.com/projects/')
+                fetch('https://backend-jz65.onrender.com/projects/')
                     .then(response => {
                         if (!response.ok) throw new Error('Failed to fetch projects');
                         return response.json();
@@ -489,7 +489,7 @@
                 activitySelect.disabled = true;
                 viewBudgetBtn.disabled = true;
                 
-                fetch(`https://man-m681.onrender.com/activities/`)
+                fetch(`https://backend-jz65.onrender.com/activities/`)
                     .then(response => {
                         if (!response.ok) throw new Error('Failed to fetch activities');
                         return response.json();
@@ -577,7 +577,7 @@
             function loadBudgetItems(projectId) {
                 budgetTableBody.innerHTML = '<tr><td colspan="6" class="loading"><i class="fas fa-spinner"></i> Loading budget items...</td></tr>';
                 
-                fetch(`https://man-m681.onrender.com/budget-items/${projectId}`)
+                fetch(`https://backend-jz65.onrender.com/budget-items/${projectId}`)
                     .then(response => {
                         if (!response.ok) throw new Error('Failed to fetch budget items');
                         return response.json();
