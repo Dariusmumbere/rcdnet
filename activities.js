@@ -805,12 +805,46 @@ async function loadPendingApprovals() {
         approvals.forEach(approval => {
             const card = document.createElement('div');
             card.className = 'approval-card';
+            
+            // Create budget items HTML
+            let budgetItemsHTML = '';
+            if (approval.budget_items && approval.budget_items.length > 0) {
+                budgetItemsHTML = `
+                    <div class="budget-items">
+                        <h4>Budget Items:</h4>
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Description</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${approval.budget_items.map(item => `
+                                    <tr>
+                                        <td>${item.item_name}</td>
+                                        <td>${item.description || '-'}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>UGX ${item.unit_price.toLocaleString()}</td>
+                                        <td>UGX ${item.total.toLocaleString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
             card.innerHTML = `
                 <h3>${approval.activity_name}</h3>
                 <p><strong>Requested By:</strong> ${approval.requested_by}</p>
                 <p><strong>Amount:</strong> UGX ${approval.requested_amount.toLocaleString()}</p>
                 <p><strong>Comments:</strong> ${approval.comments || 'None'}</p>
                 <p><strong>Requested On:</strong> ${new Date(approval.created_at).toLocaleString()}</p>
+                ${budgetItemsHTML}
                 <div class="approval-actions">
                     <button class="file-manager-btn" onclick="reviewActivityApproval(${approval.id}, 'approved')">
                         <i class="fas fa-check"></i> Approve
