@@ -1,0 +1,976 @@
+# Activity Management System
+
+Here's an HTML page that implements the requested features for managing activities, including a table with Activity Name, Project, Status, Budget Amount, and a Pay action that deducts money from a program card.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .status-planned {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-completed {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .modal-content {
+            border-radius: 10px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Activity Management</h1>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Activities</h5>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">
+                        <i class="bi bi-plus-circle"></i> Add Activity
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="search-container row">
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search activities...">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="planned">Planned</option>
+                            <option value="approved">Approved</option>
+                            <option value="completed">Completed</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <select class="form-select" id="projectFilter">
+                            <option value="">All Projects</option>
+                            <!-- Projects will be populated here -->
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <button class="btn btn-outline-secondary w-100" id="resetFilters">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Activity Name</th>
+                                <th>Project</th>
+                                <th>Status</th>
+                                <th>Budget Amount</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activitiesTableBody">
+                            <!-- Activities will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination will be populated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Activity Modal -->
+    <div class="modal fade" id="addActivityModal" tabindex="-1" aria-labelledby="addActivityModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addActivityModalLabel">Add New Activity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addActivityForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="activityName" class="form-label">Activity Name</label>
+                                <input type="text" class="form-control" id="activityName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="projectSelect" class="form-label">Project</label>
+                                <select class="form-select" id="projectSelect" required>
+                                    <!-- Projects will be populated here -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activityDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="activityDescription" rows="3"></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="startDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="endDate" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="budgetAmount" class="form-label">Budget Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="budgetAmount" min="0" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="activityStatus" class="form-label">Status</label>
+                                <select class="form-select" id="activityStatus">
+                                    <option value="planned">Planned</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary" id="addBudgetItemBtn">
+                                <i class="bi bi-plus-circle"></i> Add Budget Item
+                            </button>
+                        </div>
+                        <div id="budgetItemsContainer">
+                            <!-- Budget items will be added here -->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveActivityBtn">Save Activity</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pay Modal -->
+    <div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="payModalLabel">Process Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="payForm">
+                        <input type="hidden" id="payActivityId">
+                        <div class="mb-3">
+                            <label for="paymentAmount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="paymentAmount" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="paymentMethod" class="form-label">Payment Method</label>
+                            <select class="form-select" id="paymentMethod" required>
+                                <option value="">Select method</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="mobile_money">Mobile Money</option>
+                                <option value="cash">Cash</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="paymentDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="paymentDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="programCard" class="form-label">Deduct from Program Card</label>
+                            <select class="form-select" id="programCard" required>
+                                <option value="">Select program</option>
+                                <option value="Main Account">Main Account</option>
+                                <option value="Women Empowerment">Women Empowerment</option>
+                                <option value="Vocational Education">Vocational Education</option>
+                                <option value="Climate Change">Climate Change</option>
+                                <option value="Reproductive Health">Reproductive Health</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="processPaymentBtn">Process Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Activity Modal -->
+    <div class="modal fade" id="viewActivityModal" tabindex="-1" aria-labelledby="viewActivityModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewActivityModalLabel">Activity Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Activity Name</h6>
+                            <p id="viewActivityName"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Project</h6>
+                            <p id="viewProjectName"></p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Description</h6>
+                        <p id="viewDescription"></p>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h6>Start Date</h6>
+                            <p id="viewStartDate"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>End Date</h6>
+                            <p id="viewEndDate"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Status</h6>
+                            <p id="viewStatus"></p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Budget Amount</h6>
+                        <p id="viewBudgetAmount"></p>
+                    </div>
+                    
+                    <h5 class="mt-4">Budget Items</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                    <th>Category</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewBudgetItems">
+                                <!-- Budget items will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Budget Item Template (hidden) -->
+    <div id="budgetItemTemplate" style="display: none;">
+        <div class="budget-item card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Item Name</label>
+                        <input type="text" class="form-control item-name" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control quantity" min="1" value="1" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Unit Price</label>
+                        <input type="number" class="form-control unit-price" min="0" step="0.01" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Total</label>
+                        <input type="text" class="form-control total" readonly>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-control description">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Category</label>
+                        <select class="form-select category">
+                            <option value="materials">Materials</option>
+                            <option value="labor">Labor</option>
+                            <option value="transport">Transport</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm remove-item">
+                            <i class="bi bi-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let activities = [];
+        let projects = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        
+        // DOM elements
+        const activitiesTableBody = document.getElementById('activitiesTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const projectFilter = document.getElementById('projectFilter');
+        const resetFilters = document.getElementById('resetFilters');
+        const pagination = document.getElementById('pagination');
+        const projectSelect = document.getElementById('projectSelect');
+        const saveActivityBtn = document.getElementById('saveActivityBtn');
+        const addBudgetItemBtn = document.getElementById('addBudgetItemBtn');
+        const budgetItemsContainer = document.getElementById('budgetItemsContainer');
+        const budgetItemTemplate = document.getElementById('budgetItemTemplate');
+        const processPaymentBtn = document.getElementById('processPaymentBtn');
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchProjects();
+            fetchActivities();
+            
+            // Event listeners
+            searchInput.addEventListener('input', filterActivities);
+            statusFilter.addEventListener('change', filterActivities);
+            projectFilter.addEventListener('change', filterActivities);
+            resetFilters.addEventListener('click', resetFiltersHandler);
+            saveActivityBtn.addEventListener('click', saveActivity);
+            addBudgetItemBtn.addEventListener('click', addBudgetItem);
+            processPaymentBtn.addEventListener('click', processPayment);
+            
+            // Calculate totals when quantity or unit price changes
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('quantity') || e.target.classList.contains('unit-price')) {
+                    const item = e.target.closest('.budget-item');
+                    calculateItemTotal(item);
+                }
+            });
+            
+            // Remove budget item
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
+                    const item = e.target.closest('.budget-item');
+                    item.remove();
+                }
+            });
+        });
+        
+        // Fetch projects from API
+        function fetchProjects() {
+            fetch('/projects/')
+                .then(response => response.json())
+                .then(data => {
+                    projects = data.projects || [];
+                    populateProjectSelect(projectSelect, projects);
+                    populateProjectSelect(projectFilter, projects);
+                })
+                .catch(error => {
+                    console.error('Error fetching projects:', error);
+                    showAlert('Failed to load projects. Please try again.', 'danger');
+                });
+        }
+        
+        // Fetch activities from API
+        function fetchActivities() {
+            fetch('/activities/')
+                .then(response => response.json())
+                .then(data => {
+                    activities = data;
+                    displayActivities();
+                    updatePagination();
+                })
+                .catch(error => {
+                    console.error('Error fetching activities:', error);
+                    showAlert('Failed to load activities. Please try again.', 'danger');
+                });
+        }
+        
+        // Populate project select dropdown
+        function populateProjectSelect(selectElement, projects) {
+            selectElement.innerHTML = '<option value="">All Projects</option>';
+            projects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = project.name;
+                selectElement.appendChild(option);
+            });
+        }
+        
+        // Display activities in the table
+        function displayActivities(filteredActivities = activities) {
+            activitiesTableBody.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredActivities.length);
+            const paginatedActivities = filteredActivities.slice(startIndex, endIndex);
+            
+            if (paginatedActivities.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="7" class="text-center">No activities found</td>`;
+                activitiesTableBody.appendChild(row);
+                return;
+            }
+            
+            paginatedActivities.forEach(activity => {
+                const row = document.createElement('tr');
+                
+                // Get project name
+                const project = projects.find(p => p.id === activity.project_id) || { name: 'Unknown' };
+                
+                // Status badge
+                let statusBadgeClass = '';
+                switch(activity.status) {
+                    case 'planned': statusBadgeClass = 'status-planned'; break;
+                    case 'approved': statusBadgeClass = 'status-approved'; break;
+                    case 'completed': statusBadgeClass = 'status-completed'; break;
+                    case 'rejected': statusBadgeClass = 'status-rejected'; break;
+                }
+                
+                const statusBadge = `<span class="status-badge ${statusBadgeClass}">${activity.status}</span>`;
+                
+                // Format dates
+                const startDate = new Date(activity.start_date).toLocaleDateString();
+                const endDate = new Date(activity.end_date).toLocaleDateString();
+                
+                // Format budget amount
+                const budgetAmount = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                }).format(activity.budget);
+                
+                // Action buttons
+                let actionButtons = `
+                    <button class="btn btn-sm btn-outline-primary view-btn" data-id="${activity.id}">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                `;
+                
+                if (activity.status === 'approved') {
+                    actionButtons += `
+                        <button class="btn btn-sm btn-outline-success pay-btn" data-id="${activity.id}" data-bs-toggle="modal" data-bs-target="#payModal">
+                            <i class="bi bi-cash-coin"></i>
+                        </button>
+                    `;
+                }
+                
+                row.innerHTML = `
+                    <td>${activity.name}</td>
+                    <td>${project.name}</td>
+                    <td>${statusBadge}</td>
+                    <td>${budgetAmount}</td>
+                    <td>${startDate}</td>
+                    <td>${endDate}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            ${actionButtons}
+                            <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="${activity.id}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${activity.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                activitiesTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => viewActivity(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => editActivity(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteActivity(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.pay-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('payActivityId').value = btn.dataset.id;
+                    const activity = activities.find(a => a.id == btn.dataset.id);
+                    if (activity) {
+                        document.getElementById('paymentAmount').value = activity.budget;
+                    }
+                });
+            });
+        }
+        
+        // Filter activities based on search and filters
+        function filterActivities() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const status = statusFilter.value;
+            const projectId = projectFilter.value;
+            
+            const filtered = activities.filter(activity => {
+                const matchesSearch = activity.name.toLowerCase().includes(searchTerm) || 
+                                     activity.description?.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !status || activity.status === status;
+                
+                const matchesProject = !projectId || activity.project_id == projectId;
+                
+                return matchesSearch && matchesStatus && matchesProject;
+            });
+            
+            currentPage = 1;
+            displayActivities(filtered);
+            updatePagination(filtered.length);
+        }
+        
+        // Reset filters
+        function resetFiltersHandler() {
+            searchInput.value = '';
+            statusFilter.value = '';
+            projectFilter.value = '';
+            filterActivities();
+        }
+        
+        // Update pagination controls
+        function updatePagination(totalItems = activities.length) {
+            pagination.innerHTML = '';
+            const pageCount = Math.ceil(totalItems / itemsPerPage);
+            
+            if (pageCount <= 1) return;
+            
+            // Previous button
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#">Previous</a>`;
+            prevLi.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayActivities();
+                    updatePagination();
+                }
+            });
+            pagination.appendChild(prevLi);
+            
+            // Page numbers
+            for (let i = 1; i <= pageCount; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    displayActivities();
+                    updatePagination();
+                });
+                pagination.appendChild(li);
+            }
+            
+            // Next button
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === pageCount ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#">Next</a>`;
+            nextLi.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentPage < pageCount) {
+                    currentPage++;
+                    displayActivities();
+                    updatePagination();
+                }
+            });
+            pagination.appendChild(nextLi);
+        }
+        
+        // Add a new budget item
+        function addBudgetItem() {
+            const newItem = budgetItemTemplate.cloneNode(true);
+            newItem.style.display = 'block';
+            budgetItemsContainer.appendChild(newItem);
+            calculateItemTotal(newItem);
+        }
+        
+        // Calculate total for a budget item
+        function calculateItemTotal(item) {
+            const quantity = parseFloat(item.querySelector('.quantity').value) || 0;
+            const unitPrice = parseFloat(item.querySelector('.unit-price').value) || 0;
+            const total = quantity * unitPrice;
+            item.querySelector('.total').value = total.toFixed(2);
+        }
+        
+        // Save activity (create or update)
+        function saveActivity() {
+            const activityData = {
+                name: document.getElementById('activityName').value,
+                project_id: parseInt(document.getElementById('projectSelect').value),
+                description: document.getElementById('activityDescription').value,
+                start_date: document.getElementById('startDate').value,
+                end_date: document.getElementById('endDate').value,
+                budget: parseFloat(document.getElementById('budgetAmount').value),
+                status: document.getElementById('activityStatus').value
+            };
+            
+            // Collect budget items
+            const budgetItems = [];
+            document.querySelectorAll('.budget-item').forEach(item => {
+                budgetItems.push({
+                    item_name: item.querySelector('.item-name').value,
+                    description: item.querySelector('.description').value,
+                    quantity: parseFloat(item.querySelector('.quantity').value),
+                    unit_price: parseFloat(item.querySelector('.unit-price').value),
+                    category: item.querySelector('.category').value
+                });
+            });
+            
+            // Validate
+            if (!activityData.name || !activityData.project_id || !activityData.start_date || !activityData.end_date || !activityData.budget) {
+                showAlert('Please fill in all required fields', 'danger');
+                return;
+            }
+            
+            // Send to API
+            fetch('/activities/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(activityData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Save budget items if activity was created successfully
+                if (data.id) {
+                    const saveBudgetItems = budgetItems.map(item => {
+                        return fetch('/activities/' + data.id + '/budget-items/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(item)
+                        });
+                    });
+                    
+                    return Promise.all(saveBudgetItems).then(() => data);
+                }
+                return data;
+            })
+            .then(data => {
+                showAlert('Activity saved successfully!', 'success');
+                fetchActivities();
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addActivityModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('addActivityForm').reset();
+                budgetItemsContainer.innerHTML = '';
+            })
+            .catch(error => {
+                console.error('Error saving activity:', error);
+                showAlert('Failed to save activity. Please try again.', 'danger');
+            });
+        }
+        
+        // View activity details
+        function viewActivity(activityId) {
+            const activity = activities.find(a => a.id == activityId);
+            if (!activity) return;
+            
+            // Get project name
+            const project = projects.find(p => p.id === activity.project_id) || { name: 'Unknown' };
+            
+            // Populate modal
+            document.getElementById('viewActivityName').textContent = activity.name;
+            document.getElementById('viewProjectName').textContent = project.name;
+            document.getElementById('viewDescription').textContent = activity.description || 'No description';
+            document.getElementById('viewStartDate').textContent = new Date(activity.start_date).toLocaleDateString();
+            document.getElementById('viewEndDate').textContent = new Date(activity.end_date).toLocaleDateString();
+            document.getElementById('viewStatus').textContent = activity.status;
+            document.getElementById('viewBudgetAmount').textContent = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(activity.budget);
+            
+            // Fetch and display budget items
+            fetch('/activities/' + activityId + '/budget-items/')
+                .then(response => response.json())
+                .then(items => {
+                    const tbody = document.getElementById('viewBudgetItems');
+                    tbody.innerHTML = '';
+                    
+                    if (items.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center">No budget items</td></tr>';
+                        return;
+                    }
+                    
+                    items.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.item_name}</td>
+                            <td>${item.description || '-'}</td>
+                            <td>${item.quantity}</td>
+                            <td>${new Intl.NumberFormat('en-US', {
+                                style: 'currency',
+                                currency: 'USD'
+                            }).format(item.unit_price)}</td>
+                            <td>${new Intl.NumberFormat('en-US', {
+                                style: 'currency',
+                                currency: 'USD'
+                            }).format(item.total)}</td>
+                            <td>${item.category}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching budget items:', error);
+                    document.getElementById('viewBudgetItems').innerHTML = 
+                        '<tr><td colspan="6" class="text-center text-danger">Failed to load budget items</td></tr>';
+                });
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('viewActivityModal'));
+            modal.show();
+        }
+        
+        // Edit activity
+        function editActivity(activityId) {
+            const activity = activities.find(a => a.id == activityId);
+            if (!activity) return;
+            
+            // Populate form
+            document.getElementById('activityName').value = activity.name;
+            document.getElementById('projectSelect').value = activity.project_id;
+            document.getElementById('activityDescription').value = activity.description || '';
+            document.getElementById('startDate').value = activity.start_date;
+            document.getElementById('endDate').value = activity.end_date;
+            document.getElementById('budgetAmount').value = activity.budget;
+            document.getElementById('activityStatus').value = activity.status;
+            
+            // Fetch and populate budget items
+            fetch('/activities/' + activityId + '/budget-items/')
+                .then(response => response.json())
+                .then(items => {
+                    budgetItemsContainer.innerHTML = '';
+                    
+                    items.forEach(item => {
+                        addBudgetItem();
+                        const lastItem = budgetItemsContainer.lastElementChild;
+                        
+                        lastItem.querySelector('.item-name').value = item.item_name;
+                        lastItem.querySelector('.description').value = item.description || '';
+                        lastItem.querySelector('.quantity').value = item.quantity;
+                        lastItem.querySelector('.unit-price').value = item.unit_price;
+                        lastItem.querySelector('.category').value = item.category;
+                        calculateItemTotal(lastItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching budget items:', error);
+                    budgetItemsContainer.innerHTML = '';
+                });
+            
+            // Change save button to update
+            saveActivityBtn.textContent = 'Update Activity';
+            saveActivityBtn.onclick = function() {
+                updateActivity(activityId);
+            };
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('addActivityModal'));
+            modal.show();
+        }
+        
+        // Update activity
+        function updateActivity(activityId) {
+            const activityData = {
+                name: document.getElementById('activityName').value,
+                project_id: parseInt(document.getElementById('projectSelect').value),
+                description: document.getElementById('activityDescription').value,
+                start_date: document.getElementById('startDate').value,
+                end_date: document.getElementById('endDate').value,
+                budget: parseFloat(document.getElementById('budgetAmount').value),
+                status: document.getElementById('activityStatus').value
+            };
+            
+            // Validate
+            if (!activityData.name || !activityData.project_id || !activityData.start_date || !activityData.end_date || !activityData.budget) {
+                showAlert('Please fill in all required fields', 'danger');
+                return;
+            }
+            
+            // Send to API
+            fetch('/activities/' + activityId, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(activityData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert('Activity updated successfully!', 'success');
+                fetchActivities();
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addActivityModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('addActivityForm').reset();
+                budgetItemsContainer.innerHTML = '';
+                // Reset save button
+                saveActivityBtn.textContent = 'Save Activity';
+                saveActivityBtn.onclick = saveActivity;
+            })
+            .catch(error => {
+                console.error('Error updating activity:', error);
+                showAlert('Failed to update activity. Please try again.', 'danger');
+            });
+        }
+        
+        // Delete activity
+        function deleteActivity(activityId) {
+            if (!confirm('Are you sure you want to delete this activity?')) return;
+            
+            fetch('/activities/' + activityId, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    showAlert('Activity deleted successfully!', 'success');
+                    fetchActivities();
+                } else {
+                    throw new Error('Failed to delete activity');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting activity:', error);
+                showAlert('Failed to delete activity. Please try again.', 'danger');
+            });
+        }
+        
+        // Process payment for an activity
+        function processPayment() {
+            const paymentData = {
+                amount: parseFloat(document.getElementById('paymentAmount').value),
+                payment_method: document.getElementById('paymentMethod').value,
+                description: document.getElementById('paymentDescription').value,
+                project: document.getElementById('programCard').value
+            };
+            
+            const activityId = document.getElementById('payActivityId').value;
+            
+            // Validate
+            if (!paymentData.amount || !paymentData.payment_method || !paymentData.project) {
+                showAlert('Please fill in all required fields', 'danger');
+                return;
+            }
+            
+            // Send to API
+            fetch('/donations/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    donor_name: "Activity Payment",
+                    amount: paymentData.amount,
+                    payment_method: paymentData.payment_method,
+                    date: new Date().toISOString().split('T')[0],
+                    project: paymentData.project,
+                    notes: paymentData.description
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert('Payment processed successfully!', 'success');
+                fetchActivities();
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('payModal'));
+                modal.hide();
+                // Reset form
+                document.getElementById('payForm').reset();
+            })
+            .catch(error => {
+                console.error('Error processing payment:', error);
+                showAlert('Failed to process payment. Please try again.', 'danger');
+            });
+        }
+        
+        // Show alert message
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            // Remove alert after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
