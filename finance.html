@@ -897,143 +897,153 @@
             <head>
                 <title>Payment Voucher - ${currentActivity.name}</title>
                 <style>
-                    body { 
-                                font-family: 'Inter', Arial, sans-serif; 
-                                margin: 0; 
-                                padding: 20px; 
-                                color: #333;
-                            }
-                            .voucher { 
-                                max-width: 800px; 
-                                margin: 0 auto; 
-                                border: 1px solid #e0e0e0; 
-                                padding: 30px; 
-                                background: white;
-                                box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-                            }
-                            .header { 
-                                text-align: center; 
-                                margin-bottom: 30px; 
-                                padding-bottom: 20px;
-                                border-bottom: 1px solid #e0e0e0;
-                            }
-                            .logo { 
-                                font-size: 24px; 
-                                font-weight: bold; 
-                                margin-bottom: 5px;
-                                color: #4361ee;
-                            }
-                            .organization { 
-                                font-size: 14px; 
-                                color: #666;
-                                margin-bottom: 5px;
-                            }
-                            .title { 
-                                font-size: 20px; 
-                                text-align: center;
-                                margin: 30px 0;
-                                font-weight: 600;
-                                color: #4361ee;
-                            }
-                            .voucher-number {
-                                text-align: right;
-                                font-size: 14px;
-                                color: #666;
-                                margin-bottom: 20px;
-                            }
-                            .details { 
-                                margin-bottom: 30px; 
-                            }
-                            .detail-row { 
-                                display: flex; 
-                                margin-bottom: 10px; 
-                            }
-                            .detail-label { 
-                                font-weight: bold; 
-                                width: 150px; 
-                                color: #555;
-                            }
-                            .table { 
-                                width: 100%; 
-                                border-collapse: collapse; 
-                                margin: 20px 0; 
-                                font-size: 14px;
-                            }
-                            .table th { 
-                                background-color: #4361ee;
-                                color: white;
-                                padding: 12px 15px;
-                                text-align: left;
-                                font-weight: 600;
-                                text-transform: uppercase;
-                                letter-spacing: 0.5px;
-                            }
-                            .table td { 
-                                padding: 12px 15px;
-                                border-bottom: 1px solid #e0e0e0;
-                                vertical-align: top;
-                            }
-                            .total-row {
-                                font-weight: bold;
-                                background-color: #f8f9ff;
-                            }
-                            .signature { 
-                                margin-top: 50px; 
-                                display: flex; 
-                                justify-content: space-between; 
-                            }
-                            .signature-box { 
-                                width: 200px; 
-                                padding-top: 5px; 
-                                text-align: center;
-                                font-size: 14px;
-                            }
-                            .footer { 
-                                margin-top: 30px; 
-                                font-size: 12px; 
-                                text-align: center; 
-                                color: #999;
-                                padding-top: 20px;
-                                border-top: 1px solid #e0e0e0;
-                            }
-                            .table tr:last-child td {
-                                border-bottom: none;
-                            }
+                    body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f6fb;
+    color: #2f2f2f;
+}
 
-                            .table tr:nth-child(even) {
-                                background-color: #f8f9ff;
-                            }
+.voucher {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
 
-                            .table tr:hover td {
-                                background-color: #eef2ff;
-                            }
+.header {
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+}
 
-                            .total-row {
-                                font-weight: 700;
-                                background-color: #f8f9ff !important;
-                            }
+.logo {
+    font-size: 30px;
+    font-weight: 800;
+    color: #3b5bdb;
+    letter-spacing: 1px;
+}
 
-                            .total-row td {
-                                padding: 15px;
-                                font-size: 15px;
-                            }
+.organization {
+    font-size: 15px;
+    color: #6c757d;
+    margin-top: 4px;
+}
 
-                            .amount-column {
-                                text-align: right;
-                                font-family: 'Courier New', monospace;
-                            }
+.voucher-number {
+    text-align: right;
+    font-size: 14px;
+    color: #868e96;
+    margin-top: -20px;
+}
 
-                            .watermark {
-                                position: fixed;
-                                opacity: 0.1;
-                                font-size: 80px;
-                                color: #4361ee;
-                                transform: rotate(-45deg);
-                                left: 20%;
-                                top: 40%;
-                                z-index: -1;
-                                font-weight: bold;
-                            }
+.title {
+    font-size: 22px;
+    color: #3b5bdb;
+    font-weight: 600;
+    text-align: center;
+    margin: 40px 0 20px;
+}
+
+.details {
+    margin-bottom: 30px;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.detail-label {
+    width: 180px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 30px 0;
+}
+
+.table th {
+    background: #3b5bdb;
+    color: #fff;
+    text-align: left;
+    padding: 12px 15px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-top: 1px solid #dee2e6;
+}
+
+.table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.table tr:hover {
+    background-color: #e9f0ff;
+}
+
+.total-row {
+    font-weight: 700;
+    background-color: #edf2ff;
+    font-size: 15px;
+}
+
+.amount-column {
+    text-align: right;
+    font-family: 'Courier New', monospace;
+}
+
+.signature {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: space-between;
+    margin-top: 60px;
+}
+
+.signature-box {
+    flex: 1 1 200px;
+    text-align: center;
+    border-top: 2px solid #000;
+    padding-top: 10px;
+    font-size: 14px;
+    min-width: 180px;
+}
+
+.footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 12px;
+    color: #adb5bd;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+
+.watermark {
+    position: fixed;
+    z-index: -1;
+    font-size: 100px;
+    color: #3b5bdb;
+    opacity: 0.07;
+    transform: rotate(-45deg);
+    left: 15%;
+    top: 35%;
+    font-weight: bold;
+}
+
                             
                 </style>
             </head>
